@@ -38,7 +38,7 @@ class Shape(ABC):
         self._preview = newPreview
 
 
-class Square(Shape):
+class Rectangle(Shape):
     def __init__(self):
         Shape.__init__(self)
         self.topleft: Vec2d = None
@@ -52,3 +52,19 @@ class Square(Shape):
 
     def draw(self, cnv):
         return cnv.create_rectangle(self.topleft.x, self.topleft.y, self.bottomright.x, self.bottomright.y)
+
+
+class Oval(Shape):
+    def __init__(self):
+        Shape.__init__(self)
+        self.topleft: Vec2d = None
+        self.bottomright: Vec2d = None
+
+    def initiate(self, position):
+        self.topleft = position
+    
+    def release(self, position):
+        self.bottomright = position
+
+    def draw(self, cnv):
+        return cnv.create_oval(self.topleft.x, self.topleft.y, self.bottomright.x, self.bottomright.y)

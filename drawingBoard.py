@@ -21,7 +21,7 @@ class DrawingBoard(Canvas):
         return wrapper
     
     def leftClick(self, event):
-        self.currentElement = shapes.Square()
+        self.currentElement = shapes.Rectangle()
         self.currentElement.initiate(Vec2d(event.x, event.y))
         self.currentElement.preview = True
     
