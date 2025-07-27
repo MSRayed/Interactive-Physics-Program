@@ -8,6 +8,8 @@ class Shape(ABC):
     def __init__(self):
         self._fill: str = "red"
         self._preview: bool = False
+        self.topleft: Vec2d = None
+        self.bottomright: Vec2d = None
 
     @abstractmethod
     def initiate(self, position: Vec2d):
@@ -19,6 +21,10 @@ class Shape(ABC):
     
     @abstractmethod
     def draw(self, cnv: Canvas):
+        pass
+
+    @abstractmethod
+    def pointInside(self, point: Vec2d):
         pass
 
     @property
@@ -42,8 +48,6 @@ class Rectangle(Shape):
     def __init__(self):
         Shape.__init__(self)
         self.fill = "lightgreen"
-        self.topleft: Vec2d = None
-        self.bottomright: Vec2d = None
 
     def initiate(self, position):
         self.topleft = position
@@ -58,14 +62,19 @@ class Rectangle(Shape):
                                     self.bottomright.y, 
                                     fill=self.fill, 
                                     stipple="gray50" if self.preview else None)
+    
+    def pointInside(self, point):
+        px, py = point
+        tl_x, tl_y = self.topleft
+        br_x, br_y = self.bottomright
+
+        return tl_x <= px <= br_x and tl_y <= py <= br_y
 
 
 class Oval(Shape):
     def __init__(self):
         Shape.__init__(self)
         self.fill = "red"
-        self.topleft: Vec2d = None
-        self.bottomright: Vec2d = None
 
     def initiate(self, position):
         self.topleft = position
@@ -80,3 +89,10 @@ class Oval(Shape):
                                self.bottomright.y, 
                                fill=self.fill, 
                                stipple="gray50" if self.preview else None)
+
+    def pointInside(self, point):
+        px, py = point
+        tl_x, tl_y = self.topleft
+        br_x, br_y = self.bottomright
+
+        return tl_x <= px <= br_x and tl_y <= py <= br_y

@@ -1,6 +1,8 @@
 from tkinter import Canvas
-from elements import shapes
+from elements import shape
 from pymunk.vec2d import Vec2d
+
+from typing import List
 
 
 class DrawingBoard(Canvas):
@@ -11,9 +13,15 @@ class DrawingBoard(Canvas):
         self.bind("<B1-Motion>", self.leftMouseMotion)
         self.bind("<ButtonRelease-1>", self.leftMouseRelease)
 
+        self.elements: List[shape.Shape] = []
         self.currentElement = None
         self.lastDrawn = None
+
+        # Flags
+        self.creationFlag: bool = False
         self.finalizeFlag: bool = False
+
+        self.selection = Selection(self)
 
     def queue_redraw(func):
         def wrapper(self, *args, **kwargs):
@@ -22,19 +30,33 @@ class DrawingBoard(Canvas):
         return wrapper
     
     def leftClick(self, event):
-        self.currentElement = shapes.Rectangle()
+        for element in self.elements:
+            if element.pointInside(Vec2d(event.x, event.y)):
+                self.currentElement = element
+                return
+        
+        # If mouse not on any other element, than create a new one
+        self.creationFlag = True
+        self.currentElement = shape.Oval()
+        self.elements.append(self.currentElement)
+
         self.currentElement.initiate(Vec2d(event.x, event.y))
         self.currentElement.preview = True
     
     @queue_redraw
     def leftMouseMotion(self, event):
-        self.currentElement.release(Vec2d(event.x, event.y))
+        if self.creationFlag:
+            self.currentElement.release(Vec2d(event.x, event.y))
 
     @queue_redraw
     def leftMouseRelease(self, _):
         # Disconnect the last drawn object so it gets finalized
-        self.currentElement.preview = False
-        self.finalizeFlag = True
+        if self.creationFlag:
+            self.currentElement.preview = False
+            self.finalizeFlag = True
+            self.creationFlag = False
+        
+        self.selection.highlight(self.currentElement)
 
     def redraw(self):
         if self.currentElement:
@@ -46,3 +68,15 @@ class DrawingBoard(Canvas):
                 self.finalizeFlag = False
             
             self.lastDrawn = self.currentElement.draw(self)
+
+
+class Selection:
+    def __init__(self, cnv: Canvas):
+        self.lastDrawn = None
+        self.cnv = cnv
+        self.curr = None
+    
+    def highlight(self, curr: shape.Shape):
+        self.curr = curr
+        self.cnv.delete(self.lastDrawn)
+        self.lastDrawn = self.cnv.create_rectangle(curr.topleft.x-5, curr.topleft.y-5, curr.bottomright.x+5, curr.bottomright.y+5)
