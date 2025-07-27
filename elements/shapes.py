@@ -41,6 +41,7 @@ class Shape(ABC):
 class Rectangle(Shape):
     def __init__(self):
         Shape.__init__(self)
+        self.fill = "lightgreen"
         self.topleft: Vec2d = None
         self.bottomright: Vec2d = None
 
@@ -51,12 +52,18 @@ class Rectangle(Shape):
         self.bottomright = position
 
     def draw(self, cnv):
-        return cnv.create_rectangle(self.topleft.x, self.topleft.y, self.bottomright.x, self.bottomright.y)
+        return cnv.create_rectangle(self.topleft.x, 
+                                    self.topleft.y, 
+                                    self.bottomright.x, 
+                                    self.bottomright.y, 
+                                    fill=self.fill, 
+                                    stipple="gray50" if self.preview else None)
 
 
 class Oval(Shape):
     def __init__(self):
         Shape.__init__(self)
+        self.fill = "red"
         self.topleft: Vec2d = None
         self.bottomright: Vec2d = None
 
@@ -67,4 +74,9 @@ class Oval(Shape):
         self.bottomright = position
 
     def draw(self, cnv):
-        return cnv.create_oval(self.topleft.x, self.topleft.y, self.bottomright.x, self.bottomright.y)
+        return cnv.create_oval(self.topleft.x, 
+                               self.topleft.y, 
+                               self.bottomright.x, 
+                               self.bottomright.y, 
+                               fill=self.fill, 
+                               stipple="gray50" if self.preview else None)

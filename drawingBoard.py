@@ -13,6 +13,7 @@ class DrawingBoard(Canvas):
 
         self.currentElement = None
         self.lastDrawn = None
+        self.finalizeFlag: bool = False
 
     def queue_redraw(func):
         def wrapper(self, *args, **kwargs):
@@ -30,10 +31,18 @@ class DrawingBoard(Canvas):
         self.currentElement.release(Vec2d(event.x, event.y))
 
     @queue_redraw
-    def leftMouseRelease(self, event):
-        self.currentElement.release(Vec2d(event.x, event.y))
+    def leftMouseRelease(self, _):
+        # Disconnect the last drawn object so it gets finalized
+        self.currentElement.preview = False
+        self.finalizeFlag = True
 
     def redraw(self):
         if self.currentElement:
             self.delete(self.lastDrawn)
+            
+            if self.finalizeFlag:
+                # Draw once to finalize the element so the last version doesn't get deleted
+                self.lastDrawn = self.currentElement.draw(self)
+                self.finalizeFlag = False
+            
             self.lastDrawn = self.currentElement.draw(self)
