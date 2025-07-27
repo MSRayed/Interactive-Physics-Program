@@ -1,18 +1,20 @@
-from tkinter import *
-from tkinter import ttk
+import tkinter as tk
+from tkinter import Tk
 
-class MainWindow():
-    def __init__(self):
-        self.root = Tk()
-        self.frame = ttk.Frame(self.root)
+from drawingBoard import DrawingBoard
 
-        self.root.title("Interactive Physics")
-        self.root.geometry("800x600")
-    
-    def start(self):
-        self.root.mainloop()
+class InteractivePhysics(Tk):
+    def __init__(self, *args, **kwargs):
+        Tk.__init__(self, *args, **kwargs)
+        self.geometry("800x600")
+        self.title("Interactive Physics")
+        self.mainFrame = tk.Frame(bg="skyblue")
+        self.mainFrame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+        self.drawingBoard = DrawingBoard(self.mainFrame)
+        self.drawingBoard.pack(padx=5, pady=10, fill=tk.BOTH, expand=True)
 
 
 if __name__ == "__main__":
-    main = MainWindow()
-    main.start()
+    main = InteractivePhysics()
+    main.mainloop()
