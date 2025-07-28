@@ -15,11 +15,13 @@ class DrawingBoard(Canvas):
 
         self.elements: List[shape.Shape] = []
         self.currentElement = None
-        self.lastDrawn = None
+
+        self.mouseRecordedPos: Vec2d = None
 
         # Flags
         self.creationFlag: bool = False
         self.finalizeFlag: bool = False
+        self.movingFlag: bool = False
 
         self.selection = Selection(self)
 
@@ -33,6 +35,7 @@ class DrawingBoard(Canvas):
         for element in self.elements:
             if element.pointInside(Vec2d(event.x, event.y)):
                 self.currentElement = element
+                self.mouseRecordedPos = Vec2d(event.x, event.y)
                 return
         
         # If mouse not on any other element, than create a new one
@@ -45,11 +48,24 @@ class DrawingBoard(Canvas):
     
     @queue_redraw
     def leftMouseMotion(self, event):
+        mousePos = Vec2d(event.x, event.y)
+
         if self.creationFlag:
-            self.currentElement.release(Vec2d(event.x, event.y))
+            self.currentElement.release(mousePos)
+        else:
+            if self.currentElement:
+                self.movingFlag = True
+                
+                offset = mousePos - self.mouseRecordedPos
+
+                # Delete the last drawn before drawing moved element
+                self.currentElement.move(offset)
+                self.mouseRecordedPos = mousePos
 
     @queue_redraw
     def leftMouseRelease(self, _):
+        self.movingFlag = False
+
         if self.creationFlag:
             self.currentElement.preview = False
             self.finalizeFlag = True
@@ -59,14 +75,14 @@ class DrawingBoard(Canvas):
 
     def redraw(self):
         if self.currentElement:
-            self.delete(self.lastDrawn)
+            self.delete(self.currentElement.lastDrawn)
             
             if self.finalizeFlag:
                 # Draw once to finalize the element so the last version doesn't get deleted
-                self.lastDrawn = self.currentElement.draw(self)
+                # self.currentElement.draw(self)
                 self.finalizeFlag = False
             
-            self.lastDrawn = self.currentElement.draw(self)
+            self.currentElement.draw(self)
 
 
 class Selection:

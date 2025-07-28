@@ -10,6 +10,7 @@ class Shape(ABC):
         self._preview: bool = False
         self.p1: Vec2d = None
         self.p2: Vec2d = None
+        self.lastDrawn = None
 
     def initiate(self, position):
         # **Assuming the point as top-left
@@ -18,6 +19,10 @@ class Shape(ABC):
     def release(self, position):
         # Logic to check if the position is bottom-right or top-left
         self.p2 = position
+    
+    def move(self, offset):
+        self.p1 += offset
+        self.p2 += offset
     
     @abstractmethod
     def draw(self, cnv: Canvas):
@@ -60,11 +65,12 @@ class Rectangle(Shape):
         self.fill = "lightgreen"
 
     def draw(self, cnv):
-        return cnv.create_rectangle(self.p1.x, 
-                                    self.p1.y, 
-                                    self.p2.x, 
-                                    self.p2.y, 
-                                    fill=None if self.preview else self.fill)
+        self.lastDrawn =  cnv.create_rectangle(self.p1.x, 
+                                                self.p1.y, 
+                                                self.p2.x, 
+                                                self.p2.y, 
+                                                fill=None if self.preview else self.fill)
+        return self.lastDrawn
 
 
 class Oval(Shape):
@@ -73,8 +79,9 @@ class Oval(Shape):
         self.fill = "red"
 
     def draw(self, cnv):
-        return cnv.create_oval(self.p1.x, 
-                                    self.p1.y, 
-                                    self.p2.x, 
-                                    self.p2.y, 
-                                    fill=None if self.preview else self.fill)
+        self.lastDrawn = cnv.create_oval(self.p1.x, 
+                                        self.p1.y, 
+                                        self.p2.x, 
+                                        self.p2.y, 
+                                        fill=None if self.preview else self.fill)
+        return self.lastDrawn
