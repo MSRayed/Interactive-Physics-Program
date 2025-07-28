@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from tkinter import Canvas
 from pymunk.vec2d import Vec2d
 
+from utils import pointInsideRect
+
 
 class Shape(ABC):
     def __init__(self):
@@ -10,7 +12,6 @@ class Shape(ABC):
         self._preview: bool = False
         self.p1: Vec2d = None
         self.p2: Vec2d = None
-        self.lastDrawn = None
 
     def initiate(self, position):
         # **Assuming the point as top-left
@@ -19,6 +20,11 @@ class Shape(ABC):
     def release(self, position):
         # Logic to check if the position is bottom-right or top-left
         self.p2 = position
+
+    def if_valid(self):
+        if self.p1 and self.p2:
+            return Vec2d.get_distance(self.p1, self.p2) > 1
+        return False
     
     def move(self, offset):
         self.p1 += offset
@@ -30,17 +36,16 @@ class Shape(ABC):
 
     def pointInside(self, point):
         px, py = point
-        x_min = self.get_left_boundary()
-        x_max = self.get_right_boundary()
-        y_min = self.get_top_boundary()
-        y_max = self.get_bottom_boundary()
+        return pointInsideRect(self.left, self.top, self.right, self.bottom, px, py)
 
-        return x_min <= px <= x_max and y_min <= py <= y_max
-
-    def get_left_boundary(self): return min(self.p1.x, self.p2.x)
-    def get_right_boundary(self): return max(self.p1.x, self.p2.x)
-    def get_top_boundary(self): return min(self.p1.y, self.p2.y)
-    def get_bottom_boundary(self): return max(self.p1.y, self.p2.y)
+    @property
+    def left(self): return min(self.p1.x, self.p2.x)
+    @property
+    def right(self): return max(self.p1.x, self.p2.x)
+    @property
+    def top(self): return min(self.p1.y, self.p2.y)
+    @property
+    def bottom(self): return max(self.p1.y, self.p2.y)
 
     @property
     def fill(self):
@@ -65,13 +70,11 @@ class Rectangle(Shape):
         self.fill = "lightgreen"
 
     def draw(self, cnv):
-        self.lastDrawn =  cnv.create_rectangle(self.p1.x, 
-                                                self.p1.y, 
-                                                self.p2.x, 
-                                                self.p2.y, 
-                                                fill=None if self.preview else self.fill)
-        return self.lastDrawn
-
+        cnv.create_rectangle(self.p1.x, 
+                            self.p1.y, 
+                            self.p2.x, 
+                            self.p2.y, 
+                            fill=None if self.preview else self.fill)
 
 class Oval(Shape):
     def __init__(self):
@@ -79,9 +82,8 @@ class Oval(Shape):
         self.fill = "red"
 
     def draw(self, cnv):
-        self.lastDrawn = cnv.create_oval(self.p1.x, 
-                                        self.p1.y, 
-                                        self.p2.x, 
-                                        self.p2.y, 
-                                        fill=None if self.preview else self.fill)
-        return self.lastDrawn
+        cnv.create_oval(self.p1.x, 
+                        self.p1.y, 
+                        self.p2.x, 
+                        self.p2.y, 
+                        fill=None if self.preview else self.fill)

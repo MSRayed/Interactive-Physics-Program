@@ -61,8 +61,12 @@ class DrawingBoard(Canvas):
     @queue_redraw
     def leftMouseRelease(self, _):
         if self.creationFlag:
-            self.currentElement.preview = False
-            self.creationFlag = False
+            if self.currentElement.if_valid():
+                self.currentElement.preview = False
+                self.creationFlag = False
+            else:
+                self.elements.remove(self.currentElement)
+                self.currentElement = None
 
     def redraw(self):
         self.delete("all")
@@ -79,16 +83,18 @@ class Selection:
         self.cnv = cnv
         self.padding = 3
         self.curr = None
+        self
+    
+    def getMouseOnCorner(mouse: Vec2d):
+        pass
     
     def highlight(self, curr: shape.Shape):
         self.curr = curr
 
-        left = curr.get_left_boundary()
-        top = curr.get_top_boundary()
-        right = curr.get_right_boundary()
-        bottom = curr.get_bottom_boundary()
-
-        self.cnv.create_rectangle(left-self.padding, top-self.padding, left+self.padding, top+self.padding, fill="black")
-        self.cnv.create_rectangle(right-self.padding, top-self.padding, right+self.padding, top+self.padding, fill="black")
-        self.cnv.create_rectangle(left-self.padding, bottom-self.padding, left+self.padding, bottom+self.padding, fill="black")
-        self.cnv.create_rectangle(right-self.padding, bottom-self.padding, right+self.padding, bottom+self.padding, fill="black")
+        self.drawCorner(curr.left, curr.top)
+        self.drawCorner(curr.right, curr.top)
+        self.drawCorner(curr.left, curr.bottom)
+        self.drawCorner(curr.right, curr.bottom)
+    
+    def drawCorner(self, x, y):
+        self.cnv.create_rectangle(x-self.padding, y-self.padding, x+self.padding, y+self.padding, fill="black")
