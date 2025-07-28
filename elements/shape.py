@@ -8,24 +8,34 @@ class Shape(ABC):
     def __init__(self):
         self._fill: str = "red"
         self._preview: bool = False
-        self.topleft: Vec2d = None
-        self.bottomright: Vec2d = None
+        self.p1: Vec2d = None
+        self.p2: Vec2d = None
 
-    @abstractmethod
-    def initiate(self, position: Vec2d):
-        pass
+    def initiate(self, position):
+        # **Assuming the point as top-left
+        self.p1 = position
 
-    @abstractmethod
-    def release(self, position: Vec2d):
-        pass
+    def release(self, position):
+        # Logic to check if the position is bottom-right or top-left
+        self.p2 = position
     
     @abstractmethod
     def draw(self, cnv: Canvas):
         pass
 
-    @abstractmethod
-    def pointInside(self, point: Vec2d):
-        pass
+    def pointInside(self, point):
+        px, py = point
+        x_min = min(self.p1.x, self.p2.x)
+        x_max = max(self.p1.x, self.p2.x)
+        y_min = min(self.p1.y, self.p2.y)
+        y_max = max(self.p1.y, self.p2.y)
+
+        return x_min <= px <= x_max and y_min <= py <= y_max
+
+    def get_left_boundary(self): return min(self.p1.x, self.p2.x)
+    def get_right_boundary(self): return max(self.p1.x, self.p2.x)
+    def get_top_boundary(self): return min(self.p1.y, self.p2.y)
+    def get_bottom_boundary(self): return max(self.p1.y, self.p2.y)
 
     @property
     def fill(self):
@@ -49,26 +59,12 @@ class Rectangle(Shape):
         Shape.__init__(self)
         self.fill = "lightgreen"
 
-    def initiate(self, position):
-        self.topleft = position
-    
-    def release(self, position):
-        self.bottomright = position
-
     def draw(self, cnv):
-        return cnv.create_rectangle(self.topleft.x, 
-                                    self.topleft.y, 
-                                    self.bottomright.x, 
-                                    self.bottomright.y, 
-                                    fill=self.fill, 
-                                    stipple="gray50" if self.preview else None)
-    
-    def pointInside(self, point):
-        px, py = point
-        tl_x, tl_y = self.topleft
-        br_x, br_y = self.bottomright
-
-        return tl_x <= px <= br_x and tl_y <= py <= br_y
+        return cnv.create_rectangle(self.p1.x, 
+                                    self.p1.y, 
+                                    self.p2.x, 
+                                    self.p2.y, 
+                                    fill=None if self.preview else self.fill)
 
 
 class Oval(Shape):
@@ -76,23 +72,9 @@ class Oval(Shape):
         Shape.__init__(self)
         self.fill = "red"
 
-    def initiate(self, position):
-        self.topleft = position
-    
-    def release(self, position):
-        self.bottomright = position
-
     def draw(self, cnv):
-        return cnv.create_oval(self.topleft.x, 
-                               self.topleft.y, 
-                               self.bottomright.x, 
-                               self.bottomright.y, 
-                               fill=self.fill, 
-                               stipple="gray50" if self.preview else None)
-
-    def pointInside(self, point):
-        px, py = point
-        tl_x, tl_y = self.topleft
-        br_x, br_y = self.bottomright
-
-        return tl_x <= px <= br_x and tl_y <= py <= br_y
+        return cnv.create_oval(self.p1.x, 
+                                    self.p1.y, 
+                                    self.p2.x, 
+                                    self.p2.y, 
+                                    fill=None if self.preview else self.fill)

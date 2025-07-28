@@ -50,7 +50,6 @@ class DrawingBoard(Canvas):
 
     @queue_redraw
     def leftMouseRelease(self, _):
-        # Disconnect the last drawn object so it gets finalized
         if self.creationFlag:
             self.currentElement.preview = False
             self.finalizeFlag = True
@@ -79,4 +78,4 @@ class Selection:
     def highlight(self, curr: shape.Shape):
         self.curr = curr
         self.cnv.delete(self.lastDrawn)
-        self.lastDrawn = self.cnv.create_rectangle(curr.topleft.x-5, curr.topleft.y-5, curr.bottomright.x+5, curr.bottomright.y+5)
+        self.lastDrawn = self.cnv.create_rectangle(curr.get_left_boundary()-3, curr.get_top_boundary()-3, curr.get_right_boundary()+3, curr.get_bottom_boundary()+3)
