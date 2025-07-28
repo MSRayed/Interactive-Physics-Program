@@ -20,8 +20,6 @@ class DrawingBoard(Canvas):
 
         # Flags
         self.creationFlag: bool = False
-        self.finalizeFlag: bool = False
-        self.movingFlag: bool = False
 
         self.selection = Selection(self)
 
@@ -53,9 +51,7 @@ class DrawingBoard(Canvas):
         if self.creationFlag:
             self.currentElement.release(mousePos)
         else:
-            if self.currentElement:
-                self.movingFlag = True
-                
+            if self.currentElement:                
                 offset = mousePos - self.mouseRecordedPos
 
                 # Delete the last drawn before drawing moved element
@@ -64,34 +60,35 @@ class DrawingBoard(Canvas):
 
     @queue_redraw
     def leftMouseRelease(self, _):
-        self.movingFlag = False
-
         if self.creationFlag:
             self.currentElement.preview = False
-            self.finalizeFlag = True
             self.creationFlag = False
-        
-        self.selection.highlight(self.currentElement)
 
     def redraw(self):
-        if self.currentElement:
-            self.delete(self.currentElement.lastDrawn)
-            
-            if self.finalizeFlag:
-                # Draw once to finalize the element so the last version doesn't get deleted
-                # self.currentElement.draw(self)
-                self.finalizeFlag = False
-            
-            self.currentElement.draw(self)
+        self.delete("all")
+        
+        for element in self.elements:
+            element.draw(self)
+        
+        if self.currentElement: 
+            self.selection.highlight(self.currentElement)
 
 
 class Selection:
     def __init__(self, cnv: Canvas):
-        self.lastDrawn = None
         self.cnv = cnv
+        self.padding = 3
         self.curr = None
     
     def highlight(self, curr: shape.Shape):
         self.curr = curr
-        self.cnv.delete(self.lastDrawn)
-        self.lastDrawn = self.cnv.create_rectangle(curr.get_left_boundary()-3, curr.get_top_boundary()-3, curr.get_right_boundary()+3, curr.get_bottom_boundary()+3)
+
+        left = curr.get_left_boundary()
+        top = curr.get_top_boundary()
+        right = curr.get_right_boundary()
+        bottom = curr.get_bottom_boundary()
+
+        self.cnv.create_rectangle(left-self.padding, top-self.padding, left+self.padding, top+self.padding, fill="black")
+        self.cnv.create_rectangle(right-self.padding, top-self.padding, right+self.padding, top+self.padding, fill="black")
+        self.cnv.create_rectangle(left-self.padding, bottom-self.padding, left+self.padding, bottom+self.padding, fill="black")
+        self.cnv.create_rectangle(right-self.padding, bottom-self.padding, right+self.padding, bottom+self.padding, fill="black")

@@ -30,10 +30,10 @@ class Shape(ABC):
 
     def pointInside(self, point):
         px, py = point
-        x_min = min(self.p1.x, self.p2.x)
-        x_max = max(self.p1.x, self.p2.x)
-        y_min = min(self.p1.y, self.p2.y)
-        y_max = max(self.p1.y, self.p2.y)
+        x_min = self.get_left_boundary()
+        x_max = self.get_right_boundary()
+        y_min = self.get_top_boundary()
+        y_max = self.get_bottom_boundary()
 
         return x_min <= px <= x_max and y_min <= py <= y_max
 
