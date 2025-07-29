@@ -1,9 +1,9 @@
 from tkinter import Canvas
-from elements import shape
 from pymunk.vec2d import Vec2d
-
 from typing import List
 
+from elements import shape
+from selection import Selection
 
 class DrawingBoard(Canvas):
     def __init__(self, root, *args, **kwargs):
@@ -20,6 +20,7 @@ class DrawingBoard(Canvas):
 
         # Flags
         self.creationFlag: bool = False
+        self.resizingFlag: bool = False
 
         self.selection = Selection(self)
 
@@ -36,12 +37,19 @@ class DrawingBoard(Canvas):
                 self.mouseRecordedPos = Vec2d(event.x, event.y)
                 return
         
+        if self.selection.getMouseOnCorner(Vec2d(event.x, event.y)):
+            self.resizingFlag = True
+            return
+                
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
         self.currentElement = shape.Oval()
         self.elements.append(self.currentElement)
 
-        self.currentElement.initiate(Vec2d(event.x, event.y))
+        # Fixing the top left when creating
+        self.currentElement.left = event.x
+        self.currentElement.top = event.y
+
         self.currentElement.preview = True
     
     @queue_redraw
@@ -49,14 +57,24 @@ class DrawingBoard(Canvas):
         mousePos = Vec2d(event.x, event.y)
 
         if self.creationFlag:
-            self.currentElement.release(mousePos)
+            self.currentElement.right = event.x
+            self.currentElement.bottom = event.y
         else:
             if self.currentElement:                
+                if self.resizingFlag:
+                    self.currentElement.resize(*self.selection.lastCorner, event.x, event.y)
+                    return
+                
                 offset = mousePos - self.mouseRecordedPos
 
                 # Delete the last drawn before drawing moved element
-                self.currentElement.move(offset)
+                self.currentElement.left += offset.x
+                self.currentElement.right += offset.x
+                self.currentElement.top += offset.y
+                self.currentElement.bottom += offset.y
+
                 self.mouseRecordedPos = mousePos
+
 
     @queue_redraw
     def leftMouseRelease(self, _):
@@ -67,6 +85,9 @@ class DrawingBoard(Canvas):
             else:
                 self.elements.remove(self.currentElement)
                 self.currentElement = None
+        
+        if self.resizingFlag:
+            self.resizingFlag = False
 
     def redraw(self):
         self.delete("all")
@@ -76,25 +97,3 @@ class DrawingBoard(Canvas):
         
         if self.currentElement: 
             self.selection.highlight(self.currentElement)
-
-
-class Selection:
-    def __init__(self, cnv: Canvas):
-        self.cnv = cnv
-        self.padding = 3
-        self.curr = None
-        self
-    
-    def getMouseOnCorner(mouse: Vec2d):
-        pass
-    
-    def highlight(self, curr: shape.Shape):
-        self.curr = curr
-
-        self.drawCorner(curr.left, curr.top)
-        self.drawCorner(curr.right, curr.top)
-        self.drawCorner(curr.left, curr.bottom)
-        self.drawCorner(curr.right, curr.bottom)
-    
-    def drawCorner(self, x, y):
-        self.cnv.create_rectangle(x-self.padding, y-self.padding, x+self.padding, y+self.padding, fill="black")
