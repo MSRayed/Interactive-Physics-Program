@@ -3,7 +3,6 @@ from tkinter import Tk
 
 from drawingBoard import DrawingBoard
 from shapePanel import ShapePanel
-from utils import ShapeType
 
 
 class InteractivePhysics(Tk):

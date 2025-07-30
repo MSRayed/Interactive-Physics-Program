@@ -4,7 +4,6 @@ from typing import List
 
 from elements import shape
 from selection import Selection
-from utils import ShapeType
 
 
 class DrawingBoard(Canvas):
@@ -46,7 +45,7 @@ class DrawingBoard(Canvas):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
 
-        self.currentElement = shape.Oval()
+        self.currentElement = shape.Circle()
         self.elements.append(self.currentElement)
 
         # Fixing the top left when creating

@@ -6,6 +6,8 @@ from utils import pointInsideRect, Bound
 
 
 class Shape(ABC):
+    NAME: str = "shape"
+    
     def __init__(self):
         self.fill: str = "red"
         self.preview: bool = False
@@ -38,6 +40,8 @@ class Shape(ABC):
 
 
 class Rectangle(Shape):
+    NAME = "rectangle"
+
     def __init__(self):
         Shape.__init__(self)
         self.fill = "lightgreen"
@@ -49,7 +53,9 @@ class Rectangle(Shape):
                             self.bottom, 
                             fill=None if self.preview else self.fill)
 
-class Oval(Shape):
+class Circle(Shape):
+    NAME = "circle"
+
     def __init__(self):
         Shape.__init__(self)
         self.fill = "red"
