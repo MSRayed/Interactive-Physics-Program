@@ -29,7 +29,7 @@ class ShapePanel(Frame):
             self.images.append(img)
             Radiobutton(
                 self, value=i, indicator=0, text=shape.NAME, variable=self.selectedShape,
-                image=img, command=self.getShape
+                image=img
             ).pack()
         
         self._initialized = True
