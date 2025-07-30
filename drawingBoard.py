@@ -4,10 +4,12 @@ from typing import List
 
 from elements import shape
 from selection import Selection
+from utils import ShapeType
+
 
 class DrawingBoard(Canvas):
     def __init__(self, root, *args, **kwargs):
-        Canvas.__init__(self, root, *args, **kwargs)
+        super().__init__(root, *args, **kwargs)
 
         self.bind("<Button-1>", self.leftClick)
         self.bind("<B1-Motion>", self.leftMouseMotion)
@@ -40,9 +42,10 @@ class DrawingBoard(Canvas):
         if self.selection.getMouseOnCorner(Vec2d(event.x, event.y)):
             self.resizingFlag = True
             return
-                
+        
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
+
         self.currentElement = shape.Oval()
         self.elements.append(self.currentElement)
 

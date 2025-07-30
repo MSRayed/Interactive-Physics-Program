@@ -8,3 +8,7 @@ class Bound(Enum):
     TOP = 2
     RIGHT = 3
     BOTTOM = 4
+
+class ShapeType(Enum):
+    CIRCLE = 1
+    RECTANGLE = 2
