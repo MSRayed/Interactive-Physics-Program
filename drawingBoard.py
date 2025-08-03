@@ -2,7 +2,8 @@ from tkinter import Canvas
 from pymunk.vec2d import Vec2d
 from typing import List
 
-from elements import shape
+from elements.shape import Shape
+from shapePanel import ShapePanel
 from selection import Selection
 
 
@@ -14,7 +15,7 @@ class DrawingBoard(Canvas):
         self.bind("<B1-Motion>", self.leftMouseMotion)
         self.bind("<ButtonRelease-1>", self.leftMouseRelease)
 
-        self.elements: List[shape.Shape] = []
+        self.elements: List[Shape] = []
         self.currentElement = None
 
         self.mouseRecordedPos: Vec2d = None
@@ -45,7 +46,7 @@ class DrawingBoard(Canvas):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
 
-        self.currentElement = shape.Circle()
+        self.currentElement = ShapePanel().selectedShape()        
         self.elements.append(self.currentElement)
 
         # Fixing the top left when creating

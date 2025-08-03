@@ -15,7 +15,7 @@ class ShapePanel(Frame):
             cls._instance = super().__new__(cls)
         return cls._instance
     
-    def __init__(self, root, *args, **kwargs):
+    def __init__(self, root=None, *args, **kwargs):
         if hasattr(self, '_initialized') and self._initialized:
             return
         
@@ -28,7 +28,7 @@ class ShapePanel(Frame):
             img = PhotoImage(file=f"tool_menu_buttons_removed_background_1/{shape.NAME}.png")
             self.images.append(img)
             Radiobutton(
-                self, value=i, indicator=0, text=shape.NAME, variable=self.selectedShape,
+                self, value=i, indicator=0, text=shape.NAME, variable=self._selectedShape_var,
                 image=img
             ).pack()
         
