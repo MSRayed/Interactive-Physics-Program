@@ -78,7 +78,6 @@ class DrawingBoard(Canvas):
 
                 self.mouseRecordedPos = mousePos
 
-
     @queue_redraw
     def leftMouseRelease(self, _):
         if self.creationFlag:
@@ -91,6 +90,10 @@ class DrawingBoard(Canvas):
         
         if self.resizingFlag:
             self.resizingFlag = False
+
+        if self.currentElement:
+            # Check for the orientation and fix if opposite
+            self.currentElement.fixOrientation()
 
     def redraw(self):
         self.delete("all")

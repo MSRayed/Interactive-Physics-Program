@@ -1,5 +1,5 @@
 from tkinter import Frame, PhotoImage, Radiobutton, IntVar
-from elements.shape import Rectangle, Circle, Shape
+from elements import Rectangle, Circle, Shape
 
 from typing import List
 

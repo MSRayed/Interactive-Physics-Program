@@ -1,7 +1,7 @@
 from tkinter import Canvas
 from pymunk.vec2d import Vec2d
 
-from elements import shape
+from elements import Shape
 from utils import pointInsideRect, Bound
 
 
@@ -23,7 +23,7 @@ class Selection:
                     return self.lastCorner
         return None
     
-    def highlight(self, curr: shape.Shape):
+    def highlight(self, curr: Shape):
         self.curr = curr
 
         for x in [curr.left, curr.right]:
