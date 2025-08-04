@@ -5,6 +5,7 @@ from typing import List
 from elements.shape import Shape
 from shapePanel import ShapePanel
 from selection import Selection
+from utils import Bound
 
 
 class DrawingBoard(Canvas):
@@ -33,15 +34,15 @@ class DrawingBoard(Canvas):
         return wrapper
     
     def leftClick(self, event):
+        if self.selection.getMouseOnCorner(Vec2d(event.x, event.y)):
+            self.resizingFlag = True
+            return
+
         for element in self.elements:
             if element.pointInside(Vec2d(event.x, event.y)):
                 self.currentElement = element
                 self.mouseRecordedPos = Vec2d(event.x, event.y)
                 return
-        
-        if self.selection.getMouseOnCorner(Vec2d(event.x, event.y)):
-            self.resizingFlag = True
-            return
         
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
@@ -60,8 +61,7 @@ class DrawingBoard(Canvas):
         mousePos = Vec2d(event.x, event.y)
 
         if self.creationFlag:
-            self.currentElement.right = event.x
-            self.currentElement.bottom = event.y
+            self.currentElement.resize(Bound.RIGHT, Bound.BOTTOM, event.x, event.y)
         else:
             if self.currentElement:                
                 if self.resizingFlag:
