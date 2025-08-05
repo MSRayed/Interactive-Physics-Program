@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import Tk
 
-from drawingBoard import DrawingBoard
-from shapePanel import ShapePanel
+from ui.drawingBoard import DrawingBoard
+from ui.shapePanel import ShapePanel
 
 
 class InteractivePhysics(Tk):

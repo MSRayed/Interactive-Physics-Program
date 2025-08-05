@@ -3,8 +3,8 @@ from pymunk.vec2d import Vec2d
 from typing import List
 
 from elements.shape import Shape
-from shapePanel import ShapePanel
-from selection import Selection
+from ui.shapePanel import ShapePanel
+from ui.selection import Selection
 from utils import Bound
 
 
@@ -47,7 +47,7 @@ class DrawingBoard(Canvas):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
 
-        self.currentElement = ShapePanel().selectedShape()        
+        self.currentElement = ShapePanel().selectedShape(len(self.elements))
         self.elements.append(self.currentElement)
 
         # Fixing the top left when creating

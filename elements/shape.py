@@ -1,17 +1,29 @@
-from abc import ABC, abstractmethod
-
 from tkinter import Canvas
-
+from abc import ABC, abstractmethod
 from utils import pointInsideRect, Bound
+
+import pymunk as pm
 
 
 class Shape(ABC):
     NAME: str = "shape"
+
+    body: pm.Body | None = None
+    shape: pm.Shape
+    # position: tuple[float, float]
     
-    def __init__(self):
+    def __init__(self, id : int, mass : float=10.0, friction : float=0.5, elasticity : float=0.5, body_type : int=pm.Body.DYNAMIC):
         self.fill: str = "red"
         self.preview: bool = False
         
+        self.id = id
+        self.mass = mass
+        self.friction = friction
+        self.elasticity = elasticity
+        self.body_type = body_type
+        self.z_index = 0
+        
+        # Position data
         self.left: float = None
         self.right: float = None
         self.top: float = None
