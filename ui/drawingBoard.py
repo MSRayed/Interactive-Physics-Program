@@ -6,6 +6,7 @@ from elements.shape import Shape
 from ui.shapePanel import ShapePanel
 from ui.selection import Selection
 from utils import Bound
+from simulation import Simulation
 
 
 class DrawingBoard(Canvas):
@@ -38,7 +39,7 @@ class DrawingBoard(Canvas):
             self.resizingFlag = True
             return
 
-        for element in self.elements:
+        for element in Simulation().objects:
             if element.pointInside(Vec2d(event.x, event.y)):
                 self.currentElement = element
                 self.mouseRecordedPos = Vec2d(event.x, event.y)
@@ -47,8 +48,7 @@ class DrawingBoard(Canvas):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
 
-        self.currentElement = ShapePanel().selectedShape(len(self.elements))
-        self.elements.append(self.currentElement)
+        self.currentElement = Simulation().add_object(ShapePanel().selectedShape)
 
         # Fixing the top left when creating
         self.currentElement.left = event.x
@@ -98,7 +98,7 @@ class DrawingBoard(Canvas):
     def redraw(self):
         self.delete("all")
         
-        for element in self.elements:
+        for element in Simulation().objects:
             element.draw(self)
         
         if self.currentElement: 
