@@ -10,7 +10,7 @@ class Shape(ABC):
 
     body: pm.Body | None = None
     shape: pm.Shape
-    # position: tuple[float, float]
+    position: pm.Vec2d
     
     def __init__(self, id : int, mass : float=10.0, friction : float=0.5, elasticity : float=0.5, body_type : int=pm.Body.DYNAMIC):
         self.fill: str = "red"
@@ -22,6 +22,8 @@ class Shape(ABC):
         self.elasticity = elasticity
         self.body_type = body_type
         self.z_index = 0
+
+        self.body_type = body_type
         
         # Position data
         self.left: float = None
@@ -42,9 +44,29 @@ class Shape(ABC):
     def if_valid(self):
         return self.left != self.right and self.top != self.bottom
     
+    def move(self, offset: pm.Vec2d):
+        self.left += offset.x
+        self.right += offset.x
+        self.top += offset.y
+        self.bottom += offset.y
+    
+    def update(self):
+        # The amount moved
+        offset = self.body.position - self.position
+
+        self.move(offset)
+
+        self.position = self.body.position
+    
     @abstractmethod
     def draw(self, cnv: Canvas):
         pass
+
+    @abstractmethod
+    def place(self, space: pm.Space):
+        self.body = pm.Body(body_type=self.body_type)
+        self.position = pm.Vec2d((self.right + self.left) / 2, (self.top + self.bottom) / 2)
+        self.body.position = self.position
 
     def pointInside(self, point):
         px, py = point

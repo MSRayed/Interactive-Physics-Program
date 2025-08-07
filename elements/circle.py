@@ -11,6 +11,20 @@ class Circle(Shape):
         Shape.__init__(self, id, mass, friction, elasticity, body_type)
         self.fill = "red"
     
+    def place(self, space:pm.Space) -> None:
+        super().place(space)
+
+        self.radius = (self.right - self.left) / 2
+        self.shape = pm.Circle(self.body, self.radius)
+        # self.shape.group_id = self.group_id
+        self.shape.collision_type = 1
+        self.shape.mass = self.mass
+        self.shape.friction = self.friction
+        self.shape.elasticity = self.elasticity
+
+        if (self.body):
+            space.add(self.body, self.shape)
+    
     def resize(self, boundX, boundY, newX, newY):
         if boundX == Bound.LEFT:
             anchor_x = self.right
@@ -46,6 +60,7 @@ class Circle(Shape):
     
 
     def draw(self, cnv):
+        super().draw(cnv)
         cnv.create_oval(self.left, 
                         self.top, 
                         self.right, 

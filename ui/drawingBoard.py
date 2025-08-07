@@ -1,23 +1,24 @@
 from tkinter import Canvas
 from pymunk.vec2d import Vec2d
-from typing import List
 
-from elements.shape import Shape
 from ui.shapePanel import ShapePanel
 from ui.selection import Selection
 from utils import Bound
 from simulation import Simulation
+
+from random import randint
 
 
 class DrawingBoard(Canvas):
     def __init__(self, root, *args, **kwargs):
         super().__init__(root, *args, **kwargs)
 
+        self.root = root
+
         self.bind("<Button-1>", self.leftClick)
         self.bind("<B1-Motion>", self.leftMouseMotion)
         self.bind("<ButtonRelease-1>", self.leftMouseRelease)
 
-        self.elements: List[Shape] = []
         self.currentElement = None
 
         self.mouseRecordedPos: Vec2d = None
@@ -27,6 +28,13 @@ class DrawingBoard(Canvas):
         self.resizingFlag: bool = False
 
         self.selection = Selection(self)
+
+        # Register redraw callback with simulation
+        sim = Simulation()
+        sim.register_observer(self.schedule_redraw)
+
+    def schedule_redraw(self):
+        self.root.after(0, self.redraw)
 
     def queue_redraw(func):
         def wrapper(self, *args, **kwargs):
@@ -48,7 +56,7 @@ class DrawingBoard(Canvas):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
 
-        self.currentElement = Simulation().add_object(ShapePanel().selectedShape)
+        self.currentElement = ShapePanel().selectedShape(randint(0, 10000))
 
         # Fixing the top left when creating
         self.currentElement.left = event.x
@@ -70,11 +78,7 @@ class DrawingBoard(Canvas):
                 
                 offset = mousePos - self.mouseRecordedPos
 
-                # Delete the last drawn before drawing moved element
-                self.currentElement.left += offset.x
-                self.currentElement.right += offset.x
-                self.currentElement.top += offset.y
-                self.currentElement.bottom += offset.y
+                self.currentElement.move(offset)
 
                 self.mouseRecordedPos = mousePos
 
@@ -84,8 +88,8 @@ class DrawingBoard(Canvas):
             if self.currentElement.if_valid():
                 self.currentElement.preview = False
                 self.creationFlag = False
+                Simulation().add_object(self.currentElement)
             else:
-                self.elements.remove(self.currentElement)
                 self.currentElement = None
         
         if self.resizingFlag:
@@ -95,9 +99,11 @@ class DrawingBoard(Canvas):
             # Check for the orientation and fix if opposite
             self.currentElement.fixOrientation()
 
-    def redraw(self):
+    def redraw(self):        
         self.delete("all")
         
+        if self.currentElement: self.currentElement.draw(self)
+
         for element in Simulation().objects:
             element.draw(self)
         

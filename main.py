@@ -20,10 +20,12 @@ class InteractivePhysics(Tk):
         self.shapePanel = ShapePanel(self.toolsPanel)
         self.shapePanel.pack(padx=20, pady=20)
 
+        self.simulation = Simulation()
+
         self.drawingBoard = DrawingBoard(self.mainFrame)
         self.drawingBoard.pack(padx=5, pady=10, fill=tk.BOTH, expand=True)
 
-        self.simulation = Simulation()
+        self.simulation.start()
 
 
 if __name__ == "__main__":
