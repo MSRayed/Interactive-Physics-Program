@@ -1,6 +1,6 @@
 from tkinter import Canvas
 from abc import ABC, abstractmethod
-from utils import pointInsideRect, Bound
+from utils import point_inside_rect, Bound
 
 import pymunk as pm
 
@@ -76,11 +76,11 @@ class Shape(ABC):
         self.body.velocity = (0, 0)
         self.body.angular_velocity = 0
 
-    def pointInside(self, point):
+    def point_inside(self, point):
         px, py = point
-        return pointInsideRect(self.left, self.top, self.right, self.bottom, px, py)
+        return point_inside_rect(self.left, self.top, self.right, self.bottom, px, py)
     
-    def fixOrientation(self):
+    def fix_orientation(self):
         # If the sides are opposite
         if self.left > self.right:
             self.left, self.right = self.right, self.left

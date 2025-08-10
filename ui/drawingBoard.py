@@ -15,9 +15,9 @@ class DrawingBoard(Canvas, metaclass=Singleton):
 
         self.root = root
 
-        self.bind("<Button-1>", self.leftClick)
-        self.bind("<B1-Motion>", self.leftMouseMotion)
-        self.bind("<ButtonRelease-1>", self.leftMouseRelease)
+        self.bind("<Button-1>", self.left_click)
+        self.bind("<B1-Motion>", self.left_mouse_motion)
+        self.bind("<ButtonRelease-1>", self.left_mouse_release)
 
         self.currentElement = None
 
@@ -42,13 +42,13 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             self.redraw()
         return wrapper
     
-    def leftClick(self, event):
-        if self.selection.getMouseOnCorner(Vec2d(event.x, event.y)):
+    def left_click(self, event):
+        if self.selection.get_mouse_on_corner(Vec2d(event.x, event.y)):
             self.resizingFlag = True
             return
 
         for element in Simulation().objects:
-            if element.pointInside(Vec2d(event.x, event.y)):
+            if element.point_inside(Vec2d(event.x, event.y)):
                 self.currentElement = element
                 self.mouseRecordedPos = Vec2d(event.x, event.y)
                 return
@@ -70,7 +70,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         self.currentElement.preview = True
     
     @queue_redraw
-    def leftMouseMotion(self, event):
+    def left_mouse_motion(self, event):
         mousePos = Vec2d(event.x, event.y)
 
         if self.creationFlag and self.currentElement:
@@ -88,7 +88,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
                 self.mouseRecordedPos = mousePos
 
     @queue_redraw
-    def leftMouseRelease(self, _):
+    def left_mouse_release(self, _):
         if self.creationFlag:
             if self.currentElement.if_valid():
                 self.currentElement.preview = False
@@ -103,7 +103,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
 
         if self.currentElement:
             # Check for the orientation and fix if opposite
-            self.currentElement.fixOrientation()
+            self.currentElement.fix_orientation()
 
     def redraw(self):        
         self.delete("all")
