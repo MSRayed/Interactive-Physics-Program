@@ -1,19 +1,11 @@
 from tkinter import Frame, Button, PhotoImage
 from simulation import Simulation
 
+from utils import Singleton
 
-class SimulationControlPanel(Frame):
-    _instance = None
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-    
+class SimulationControlPanel(Frame, metaclass=Singleton):
     def __init__(self, root=None, *args, **kwargs):
-        if hasattr(self, '_initialized') and self._initialized:
-            return
-        
         super().__init__(root, *args, **kwargs)
 
         # Load images
@@ -53,8 +45,6 @@ class SimulationControlPanel(Frame):
         self.runButton.pack(side="left", padx=5)
         self.stopButton.pack(side="left", padx=5)
         self.resetButton.pack(side="left", padx=5)
-
-        self._initialized = True
 
     def start_simulation(self):
         """Run button pressed."""

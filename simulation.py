@@ -1,26 +1,15 @@
 import pymunk as pm
 from typing import List, Callable
 from elements import Shape
+from utils import Singleton
 
 import threading
 import time
 
 
-class Simulation:
+class Simulation(metaclass=Singleton):
     objects: List[Shape] = []
-    _instance = None
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-
     def __init__(self):
-        if hasattr(self, '_initialized') and self._initialized:
-            return
-
-        self._initialized = True
-
         self.space = pm.Space()
         self.space.gravity = (0, 981)
 

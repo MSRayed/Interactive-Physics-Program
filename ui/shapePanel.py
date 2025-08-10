@@ -3,21 +3,13 @@ from tkinter import Frame, PhotoImage, Button
 from elements import Rectangle, Circle, Shape
 from typing import List, Optional
 
+from utils import Singleton
+
 SHAPES: List[Shape] = [Rectangle, Circle]
 
 
-class ShapePanel(Frame):
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-
+class ShapePanel(Frame, metaclass=Singleton):
     def __init__(self, root=None, *args, **kwargs):
-        if hasattr(self, '_initialized') and self._initialized:
-            return
-
         super().__init__(root, *args, **kwargs)
 
         self.images = []
@@ -47,8 +39,6 @@ class ShapePanel(Frame):
         )
         self.anchorButton.grid(column=self.anchorButtonIdx % 2, row=math.ceil((self.anchorButtonIdx + 1) / 2))
         self.buttons.append(self.anchorButton)
-
-        self._initialized = True
     
     def set_anchor_active(self):
         self.set_active(self.anchorButtonIdx)

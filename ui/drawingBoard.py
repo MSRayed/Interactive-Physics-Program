@@ -3,24 +3,14 @@ from pymunk.vec2d import Vec2d
 
 from ui.shapePanel import ShapePanel
 from ui.selection import Selection
-from utils import Bound
+from utils import Bound, Singleton
 from simulation import Simulation
 
 from random import randint
 
 
-class DrawingBoard(Canvas):
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-    
+class DrawingBoard(Canvas, metaclass=Singleton):
     def __init__(self, root=None, *args, **kwargs):
-        if hasattr(self, '_initialized') and self._initialized:
-            return
-        
         super().__init__(root, *args, **kwargs)
 
         self.root = root
@@ -42,8 +32,6 @@ class DrawingBoard(Canvas):
         # Register redraw callback with simulation
         sim = Simulation()
         sim.register_observer(self.schedule_redraw)
-
-        self._initialized = True
 
     def schedule_redraw(self):
         self.root.after(0, self.redraw)
@@ -72,7 +60,7 @@ class DrawingBoard(Canvas):
 
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
-        
+
         self.currentElement = ShapePanel().selectedShape(randint(0, 10000))
 
         # Fixing the top left when creating
