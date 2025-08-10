@@ -10,7 +10,17 @@ from random import randint
 
 
 class DrawingBoard(Canvas):
-    def __init__(self, root, *args, **kwargs):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def __init__(self, root=None, *args, **kwargs):
+        if hasattr(self, '_initialized') and self._initialized:
+            return
+        
         super().__init__(root, *args, **kwargs)
 
         self.root = root
@@ -33,6 +43,8 @@ class DrawingBoard(Canvas):
         sim = Simulation()
         sim.register_observer(self.schedule_redraw)
 
+        self._initialized = True
+
     def schedule_redraw(self):
         self.root.after(0, self.redraw)
 
@@ -53,9 +65,14 @@ class DrawingBoard(Canvas):
                 self.mouseRecordedPos = Vec2d(event.x, event.y)
                 return
         
+
+        if not ShapePanel().selectedShape:
+            # Has to have a shape selected
+            return
+
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
-
+        
         self.currentElement = ShapePanel().selectedShape(randint(0, 10000))
 
         # Fixing the top left when creating
@@ -68,7 +85,7 @@ class DrawingBoard(Canvas):
     def leftMouseMotion(self, event):
         mousePos = Vec2d(event.x, event.y)
 
-        if self.creationFlag:
+        if self.creationFlag and self.currentElement:
             self.currentElement.resize(Bound.RIGHT, Bound.BOTTOM, event.x, event.y)
         else:
             if self.currentElement:                

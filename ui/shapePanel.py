@@ -36,17 +36,22 @@ class ShapePanel(Frame):
             self.buttons.append(btn)
 
         # Anchor button
-        anchor_img = PhotoImage(file=f"tool_menu_buttons_removed_background_1/anchor.png")
-        self.images.append(anchor_img)
-        anchor_index = len(SHAPES)
-        btn_anchor = Button(
-            self, image=anchor_img, text="Anchor", borderwidth=0,
-            command=lambda idx=anchor_index: self.set_active(idx)
+        anchorImg = PhotoImage(file=f"tool_menu_buttons_removed_background_1/anchor.png")
+        self.images.append(anchorImg)
+
+        self.anchorButtonIdx = len(SHAPES)
+
+        self.anchorButton = Button(
+            self, image=anchorImg, text="Anchor", borderwidth=0,
+            command = self.set_anchor_active
         )
-        btn_anchor.grid(column=anchor_index % 2, row=math.ceil((anchor_index + 1) / 2))
-        self.buttons.append(btn_anchor)
+        self.anchorButton.grid(column=self.anchorButtonIdx % 2, row=math.ceil((self.anchorButtonIdx + 1) / 2))
+        self.buttons.append(self.anchorButton)
 
         self._initialized = True
+    
+    def set_anchor_active(self):
+        self.set_active(self.anchorButtonIdx)
 
     def set_active(self, index: int):
         """Set a button active and reset others."""
