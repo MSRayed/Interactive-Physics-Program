@@ -89,6 +89,7 @@ class DrawingBoard(Canvas):
                 self.currentElement.preview = False
                 self.creationFlag = False
                 Simulation().add_object(self.currentElement)
+                ShapePanel().clear_selection()
             else:
                 self.currentElement = None
         
