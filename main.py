@@ -3,6 +3,8 @@ from tkinter import Tk
 
 from ui.drawingBoard import DrawingBoard
 from ui.shapePanel import ShapePanel
+from ui.simulationControlPanel import SimulationControlPanel
+
 from simulation import Simulation
 
 
@@ -17,15 +19,18 @@ class InteractivePhysics(Tk):
         self.toolsPanel = tk.Frame(self.mainFrame, bg="lightgray")
         self.toolsPanel.pack(side=tk.LEFT, fill=tk.Y)
 
-        self.shapePanel = ShapePanel(self.toolsPanel)
-        self.shapePanel.pack(padx=20, pady=20)
-
         self.simulation = Simulation()
 
         self.drawingBoard = DrawingBoard(self.mainFrame)
         self.drawingBoard.pack(padx=5, pady=10, fill=tk.BOTH, expand=True)
 
-        self.simulation.start()
+        self.simControlPanel = SimulationControlPanel(self.toolsPanel)
+        self.simControlPanel.pack(padx=20, side=tk.TOP)
+
+        self.shapePanel = ShapePanel(self.toolsPanel)
+        self.shapePanel.pack(padx=20, pady=20)
+
+        # self.simulation.start()
 
 
 if __name__ == "__main__":

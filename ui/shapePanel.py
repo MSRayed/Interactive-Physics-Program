@@ -1,4 +1,6 @@
-from tkinter import Frame, PhotoImage, Radiobutton, IntVar
+import math
+
+from tkinter import Frame, PhotoImage, Radiobutton, IntVar, FLAT
 from elements import Rectangle, Circle, Shape
 
 from typing import List
@@ -29,8 +31,8 @@ class ShapePanel(Frame):
             self.images.append(img)
             Radiobutton(
                 self, value=i, indicator=0, text=shape.NAME, variable=self._selectedShape_var,
-                image=img
-            ).pack()
+                image=img, relief=FLAT
+            ).grid(column=i % 2, row=math.ceil((i+1) / 2))
         
         self._initialized = True
     

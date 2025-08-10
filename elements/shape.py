@@ -11,6 +11,7 @@ class Shape(ABC):
     body: pm.Body | None = None
     shape: pm.Shape
     position: pm.Vec2d
+    orgPosition: pm.Vec2d
     
     def __init__(self, id : int, mass : float=10.0, friction : float=0.5, elasticity : float=0.5, body_type : int=pm.Body.DYNAMIC):
         self.fill: str = "red"
@@ -66,7 +67,14 @@ class Shape(ABC):
     def place(self, space: pm.Space):
         self.body = pm.Body(body_type=self.body_type)
         self.position = pm.Vec2d((self.right + self.left) / 2, (self.top + self.bottom) / 2)
+        self.orgPosition = pm.Vec2d((self.right + self.left) / 2, (self.top + self.bottom) / 2)
         self.body.position = self.position
+    
+    def reset(self) -> None:
+        self.body.position = self.orgPosition
+        self.body.angle = 0
+        self.body.velocity = (0, 0)
+        self.body.angular_velocity = 0
 
     def pointInside(self, point):
         px, py = point

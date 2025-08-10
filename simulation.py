@@ -20,6 +20,7 @@ class Simulation:
             return
 
         self._initialized = True
+
         self.space = pm.Space()
         self.space.gravity = (0, 981)
 
@@ -28,6 +29,7 @@ class Simulation:
         self._observers: List[Callable] = []
 
         self._running = False
+        self._physicsRunning = False
         self._thread: threading.Thread = None
 
     def start(self):
@@ -44,23 +46,33 @@ class Simulation:
             self._thread.join()
             self._thread = None
 
+    def reset(self):
+        """Reset every object back to original state"""
+        for obj in self.objects:
+            obj.reset()
+        
+        self.step()
+
     def _loop(self):
         """Simulation update loop running in background."""
         while self._running:
-            start_time = time.perf_counter()
+            self.step()
 
-            self.space.step(self.dt)
+    def step(self):
+        start_time = time.perf_counter()
 
-            for obj in self.objects:
-                obj.update()
+        self.space.step(self.dt)
 
-            # For other parts using the clock
-            for callback in self._observers:
-                callback()
+        for obj in self.objects:
+            obj.update()
 
-            elapsed = time.perf_counter() - start_time
-            sleep_time = max(0, self.dt - elapsed)
-            time.sleep(sleep_time)
+        # For other parts using the clock
+        for callback in self._observers:
+            callback()
+
+        elapsed = time.perf_counter() - start_time
+        sleep_time = max(0, self.dt - elapsed)
+        time.sleep(sleep_time)
 
     def register_observer(self, callback: Callable):
         self._observers.append(callback)
@@ -68,3 +80,5 @@ class Simulation:
     def add_object(self, obj: Shape):
         self.objects.append(obj)
         obj.place(self.space)
+
+    
