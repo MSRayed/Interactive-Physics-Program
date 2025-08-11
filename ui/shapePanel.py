@@ -1,7 +1,9 @@
 import math
-from tkinter import Frame, PhotoImage, Button
+from tkinter import Frame
 from elements import Rectangle, Circle, Shape
 from typing import List, Optional
+
+from ui.toolManager import ToolManager
 
 from utils import Singleton
 
@@ -18,25 +20,19 @@ class ShapePanel(Frame, metaclass=Singleton):
 
         # Create shape buttons
         for i, shape in enumerate(SHAPES):
-            img = PhotoImage(file=f"tool_menu_buttons_removed_background_1/{shape.NAME}.png")
-            self.images.append(img)
-            btn = Button(
-                self, image=img, text=shape.NAME, borderwidth=0,
-                command=lambda idx=i: self.set_active(idx)
-            )
+            btn = ToolManager().generate_tool_button(self, file=f"tool_menu_buttons_removed_background_1/{shape.NAME}.png", 
+                                                     name=shape.NAME, 
+                                                     command=lambda idx=i: self.set_active(idx))
             btn.grid(column=i % 2, row=math.ceil((i + 1) / 2))
             self.buttons.append(btn)
 
         # Anchor button
-        anchorImg = PhotoImage(file=f"tool_menu_buttons_removed_background_1/anchor.png")
-        self.images.append(anchorImg)
-
         self.anchorButtonIdx = len(SHAPES)
 
-        self.anchorButton = Button(
-            self, image=anchorImg, text="Anchor", borderwidth=0,
-            command = self.set_anchor_active
-        )
+        self.anchorButton = ToolManager().generate_tool_button(self, file="tool_menu_buttons_removed_background_1/anchor.png",
+                                                               name="Anchor",
+                                                               command=self.set_anchor_active
+                                                               )
         self.anchorButton.grid(column=self.anchorButtonIdx % 2, row=math.ceil((self.anchorButtonIdx + 1) / 2))
         self.buttons.append(self.anchorButton)
     
