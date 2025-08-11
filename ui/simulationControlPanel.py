@@ -1,4 +1,4 @@
-from tkinter import Frame, Button, PhotoImage
+from tkinter import Frame
 from simulation import Simulation
 from ui.toolManager import ToolManager
 

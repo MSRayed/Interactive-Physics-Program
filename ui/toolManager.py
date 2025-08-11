@@ -8,6 +8,8 @@ from utils import Singleton
 class ToolManager(metaclass=Singleton):
     def __init__(self):
         self.imageCache = []
+
+        self.currentTool = None 
     
     def generate_tool_button(self, root, file, name, command: Callable):
         img = PhotoImage(file=file)
@@ -17,3 +19,5 @@ class ToolManager(metaclass=Singleton):
 
         return btn
 
+    def set_current_tool(self, tool):
+        self.currentTool = tool

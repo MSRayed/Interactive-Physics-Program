@@ -1,6 +1,6 @@
 import math
 from tkinter import Frame
-from elements import Rectangle, Circle, Shape
+from elements import Rectangle, Circle, Shape, Anchor
 from typing import List, Optional
 
 from ui.toolManager import ToolManager
@@ -21,23 +21,29 @@ class ShapePanel(Frame, metaclass=Singleton):
         # Create shape buttons
         for i, shape in enumerate(SHAPES):
             btn = ToolManager().generate_tool_button(self, file=f"tool_menu_buttons_removed_background_1/{shape.NAME}.png", 
-                                                     name=shape.NAME, 
-                                                     command=lambda idx=i: self.set_active(idx))
+                                                    name=shape.NAME, 
+                                                    command=lambda idx=i: self.set_active(idx))
             btn.grid(column=i % 2, row=math.ceil((i + 1) / 2))
             self.buttons.append(btn)
 
         # Anchor button
-        self.anchorButtonIdx = len(SHAPES)
+        anchorButtonIdx = len(SHAPES)
 
         self.anchorButton = ToolManager().generate_tool_button(self, file="tool_menu_buttons_removed_background_1/anchor.png",
                                                                name="Anchor",
                                                                command=self.set_anchor_active
                                                                )
-        self.anchorButton.grid(column=self.anchorButtonIdx % 2, row=math.ceil((self.anchorButtonIdx + 1) / 2))
+        self.anchorButton.grid(column=anchorButtonIdx % 2, row=math.ceil((anchorButtonIdx + 1) / 2))
         self.buttons.append(self.anchorButton)
     
     def set_anchor_active(self):
-        self.set_active(self.anchorButtonIdx)
+        # Clear previous selection
+        for btn in self.buttons:
+            btn.config(bg=self.cget("bg"))  # reset to default background
+
+        self.anchorButton.config(bg="lightblue")
+        self.active_index = None
+        ToolManager().set_current_tool(Anchor)
 
     def set_active(self, index: int):
         """Set a button active and reset others."""
@@ -48,6 +54,7 @@ class ShapePanel(Frame, metaclass=Singleton):
         # Set new selection
         self.buttons[index].config(bg="lightblue")
         self.active_index = index
+        ToolManager().set_current_tool(self.selectedShape)
 
     def clear_selection(self):
         """Deselect all buttons."""

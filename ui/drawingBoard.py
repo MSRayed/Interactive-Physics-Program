@@ -3,8 +3,10 @@ from pymunk.vec2d import Vec2d
 
 from ui.shapePanel import ShapePanel
 from ui.selection import Selection
+from ui.toolManager import ToolManager
 from utils import Bound, Singleton
 from simulation import Simulation
+from elements import Shape, Anchor
 
 from random import randint
 
@@ -51,23 +53,25 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             if element.point_inside(Vec2d(event.x, event.y)):
                 self.currentElement = element
                 self.mouseRecordedPos = Vec2d(event.x, event.y)
+
+                if ToolManager().currentTool is Anchor:
+                    print("Anchoring", self.currentElement)
+                    Anchor.act(self.currentElement)
+
                 return
         
+        # Creating shapes
+        if issubclass(ToolManager().currentTool, Shape):
+            # If mouse not on any other element, than create a new one
+            self.creationFlag = True
 
-        if not ShapePanel().selectedShape:
-            # Has to have a shape selected
-            return
+            self.currentElement = ShapePanel().selectedShape(randint(0, 10000))
 
-        # If mouse not on any other element, than create a new one
-        self.creationFlag = True
+            # Fixing the top left when creating
+            self.currentElement.left = event.x
+            self.currentElement.top = event.y
 
-        self.currentElement = ShapePanel().selectedShape(randint(0, 10000))
-
-        # Fixing the top left when creating
-        self.currentElement.left = event.x
-        self.currentElement.top = event.y
-
-        self.currentElement.preview = True
+            self.currentElement.preview = True
     
     @queue_redraw
     def left_mouse_motion(self, event):
