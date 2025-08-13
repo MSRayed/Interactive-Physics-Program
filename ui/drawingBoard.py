@@ -6,7 +6,8 @@ from ui.selection import Selection
 from ui.toolManager import ToolManager
 from utils import Bound, Singleton
 from simulation import Simulation
-from elements import Shape, Anchor
+from elements import Shape
+from elements.tool import Tool
 
 from random import randint
 
@@ -54,9 +55,8 @@ class DrawingBoard(Canvas, metaclass=Singleton):
                 self.currentElement = element
                 self.mouseRecordedPos = Vec2d(event.x, event.y)
 
-                if ToolManager().currentTool is Anchor:
-                    print("Anchoring", self.currentElement)
-                    Anchor.act(self.currentElement)
+                if issubclass(ToolManager().currentTool, Tool):
+                    ToolManager().currentTool.act(self.currentElement)
 
                 return
         

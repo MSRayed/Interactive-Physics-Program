@@ -25,6 +25,8 @@ class Shape(ABC):
         self.z_index = 0
 
         self.body_type = body_type
+
+        self.anchored = False
         
         # Position data
         self.left: float = None
