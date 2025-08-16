@@ -5,6 +5,8 @@ from ui.toolManager import ToolManager
 from utils import Singleton
 from simulation import Simulation
 
+from ui.selection import Selection
+
 from random import randint
 
 
@@ -20,6 +22,10 @@ class DrawingBoard(Canvas, metaclass=Singleton):
 
         self.currentElement = None
 
+        self.tempElement = None
+
+        self.selection = Selection(self)
+
         # Register redraw callback with simulation
         sim = Simulation()
         sim.register_observer(self.schedule_redraw)
@@ -34,10 +40,12 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         return wrapper
     
     def left_click(self, event):
+        mousePos = Vec2d(event.x, event.y)
+
         for element in Simulation().objects:
-            if element.point_inside(Vec2d(event.x, event.y)):
+            if element.point_inside(mousePos):
                 self.currentElement = element
-                self.currentElement.select(Vec2d(event.x, event.y))
+                self.currentElement.click_event(mousePos)
                 return
         
         # Creating shapes
@@ -45,28 +53,38 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             # If mouse not on any other element, than create a new one
             self.creationFlag = True
 
-            self.currentElement = ToolManager().currentTool(randint(0, 10000))
+            self.tempElement = ToolManager().currentTool(randint(0, 10000))
 
-            self.currentElement.initiate(Vec2d(event.x, event.y))
+            self.tempElement.initiate(Vec2d(event.x, event.y))
     
     @queue_redraw
     def left_mouse_motion(self, event):
         mousePos = Vec2d(event.x, event.y)
 
-        self.currentElement.handle_event(mousePos)
+        if self.tempElement:
+            self.tempElement.motion_event(mousePos)
+            return
+        
+        self.currentElement.motion_event(mousePos)
 
     @queue_redraw
-    def left_mouse_release(self, _):
-        if self.currentElement:
-            self.currentElement.initialize()
-            Simulation().add_object(self.currentElement)
+    def left_mouse_release(self, _):        
+        if self.tempElement:
+            self.tempElement.initialize()
+            Simulation().add_object(self.tempElement)
+            self.tempElement, self.currentElement = None, self.tempElement
         else:
-            self.currentElement = None
+            self.tempElement = None
+        
+        if self.currentElement:
+            self.currentElement.release_event()
 
     def redraw(self):        
         self.delete("all")
         
-        if self.currentElement: self.currentElement.draw(self)
+        if self.tempElement: self.tempElement.draw(self)
 
         for element in Simulation().objects:
             element.draw(self)
+        
+        if self.currentElement: self.selection.highlight(self.currentElement)

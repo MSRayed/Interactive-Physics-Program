@@ -1,6 +1,6 @@
 from tkinter import Canvas
 from abc import ABC, abstractmethod
-from utils import Bound
+from utils import Bound, point_inside_rect
 
 from .tool import Tool
 
@@ -30,7 +30,7 @@ class Shape(ABC, Tool):
         self.body_type = body_type
 
         self.creationFlag = False
-        self.resizingFlag = False
+        self.mouseOnCorner = None
 
         self.mouseRecordedPos = None
     
@@ -84,6 +84,14 @@ class Shape(ABC, Tool):
             self.left, self.right = self.right, self.left
         if self.top > self.bottom:
             self.bottom, self.top = self.top, self.bottom
+    
+    def get_mouse_on_corner(self, mouse: pm.Vec2d):
+        for (x, boundX) in zip([self.left, self.right], [Bound.LEFT, Bound.RIGHT]):
+            for (y, boundY) in zip([self.top, self.bottom], [Bound.TOP, Bound.BOTTOM]):
+                if point_inside_rect(x-self.cornerSize, y-self.cornerSize, x+self.cornerSize, y+self.cornerSize, mouse.x, mouse.y):
+                    return [boundX, boundY]
+        return None
+    
 
     def initiate(self, event):
         # If mouse not on any other element, than create a new one
@@ -94,13 +102,19 @@ class Shape(ABC, Tool):
         self.top = event.y
 
         self.preview = True
+
+    def click_event(self, event):
+        self.mouseRecordedPos = event
+
+        if self.get_mouse_on_corner(event):
+            self.mouseOnCorner = self.get_mouse_on_corner(event)
     
-    def handle_event(self, event):
+    def motion_event(self, event):
         if self.creationFlag:
             self.resize(Bound.RIGHT, Bound.BOTTOM, event.x, event.y)
         else:
-            if self.resizingFlag:
-                self.resize(*self.selection.lastCorner, event.x, event.y)
+            if self.mouseOnCorner:
+                self.resize(*self.mouseOnCorner, event.x, event.y)
                 return
             
             offset = event - self.mouseRecordedPos
@@ -109,18 +123,14 @@ class Shape(ABC, Tool):
 
             self.mouseRecordedPos = event
     
+    def release_event(self):
+        self.mouseOnCorner = None
+    
     def initialize(self):
         if self.creationFlag:
             if self.if_valid():
                 self.preview = False
                 self.creationFlag = False
                 # ShapePanel().clear_selection()
-        
-        if self.resizingFlag:
-            self.resizingFlag = False
-
         # Check for the orientation and fix if opposite
         self.fix_orientation()
-
-    def select(self, event):
-        self.mouseRecordedPos = event
