@@ -1,11 +1,13 @@
 from tkinter import Canvas
 from abc import ABC, abstractmethod
-from utils import point_inside_rect, Bound
+from utils import Bound
+
+from .tool import Tool
 
 import pymunk as pm
 
 
-class Shape(ABC):
+class Shape(ABC, Tool):
     NAME: str = "shape"
 
     body: pm.Body | None = None
@@ -14,10 +16,11 @@ class Shape(ABC):
     orgPosition: pm.Vec2d
     
     def __init__(self, id : int, mass : float=10.0, friction : float=0.5, elasticity : float=0.5, body_type : int=pm.Body.DYNAMIC):
+        Tool.__init__(self, id)
+
         self.fill: str = "red"
         self.preview: bool = False
         
-        self.id = id
         self.mass = mass
         self.friction = friction
         self.elasticity = elasticity
@@ -25,12 +28,11 @@ class Shape(ABC):
         self.z_index = 0
 
         self.body_type = body_type
-        
-        # Position data
-        self.left: float = None
-        self.right: float = None
-        self.top: float = None
-        self.bottom: float = None
+
+        self.creationFlag = False
+        self.resizingFlag = False
+
+        self.mouseRecordedPos = None
     
     def resize(self, boundX: Bound, boundY: Bound, newX, newY):
         if boundX == Bound.LEFT:
@@ -75,10 +77,6 @@ class Shape(ABC):
         self.body.angle = 0
         self.body.velocity = (0, 0)
         self.body.angular_velocity = 0
-
-    def point_inside(self, point):
-        px, py = point
-        return point_inside_rect(self.left, self.top, self.right, self.bottom, px, py)
     
     def fix_orientation(self):
         # If the sides are opposite
@@ -86,3 +84,43 @@ class Shape(ABC):
             self.left, self.right = self.right, self.left
         if self.top > self.bottom:
             self.bottom, self.top = self.top, self.bottom
+
+    def initiate(self, event):
+        # If mouse not on any other element, than create a new one
+        self.creationFlag = True
+
+        # Fixing the top left when creating
+        self.left = event.x
+        self.top = event.y
+
+        self.preview = True
+    
+    def handle_event(self, event):
+        if self.creationFlag:
+            self.resize(Bound.RIGHT, Bound.BOTTOM, event.x, event.y)
+        else:
+            if self.resizingFlag:
+                self.resize(*self.selection.lastCorner, event.x, event.y)
+                return
+            
+            offset = event - self.mouseRecordedPos
+
+            self.move(offset)
+
+            self.mouseRecordedPos = event
+    
+    def initialize(self):
+        if self.creationFlag:
+            if self.if_valid():
+                self.preview = False
+                self.creationFlag = False
+                # ShapePanel().clear_selection()
+        
+        if self.resizingFlag:
+            self.resizingFlag = False
+
+        # Check for the orientation and fix if opposite
+        self.fix_orientation()
+
+    def select(self, event):
+        self.mouseRecordedPos = event

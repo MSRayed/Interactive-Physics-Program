@@ -1,6 +1,6 @@
 import pymunk as pm
 from typing import List, Callable
-from elements import Shape
+from elements import Tool
 from utils import Singleton
 
 import threading
@@ -8,7 +8,7 @@ import time
 
 
 class Simulation(metaclass=Singleton):
-    objects: List[Shape] = []
+    objects: List[Tool] = []
     def __init__(self):
         self.space = pm.Space()
         self.space.gravity = (0, 981)
@@ -66,7 +66,7 @@ class Simulation(metaclass=Singleton):
     def register_observer(self, callback: Callable):
         self._observers.append(callback)
 
-    def add_object(self, obj: Shape):
+    def add_object(self, obj: Tool):
         self.objects.append(obj)
         obj.place(self.space)
 
