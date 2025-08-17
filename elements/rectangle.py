@@ -13,7 +13,7 @@ class Rectangle(Shape):
     def place(self, space:pm.Space) -> None:
         super().place(space)
 
-        self.points = [(self.left, self.top), (self.right, self.top), (self.right, self.bottom), (self.left, self.bottom)]
+        self.points = [(-self.width/2, -self.height/2), (self.width/2, -self.height/2), (self.width/2, self.height/2), (-self.width/2, self.height/2)]
         self.shape = pm.shapes.Poly(self.body, self.points)
         # self.shape.group_id = self.group_id
         self.shape.collision_type = 1
@@ -26,8 +26,16 @@ class Rectangle(Shape):
 
     def draw(self, cnv):
         super().draw(cnv)
-        cnv.create_rectangle(self.left, 
+        super().draw(cnv)
+        if self.preview:
+            cnv.create_rectangle(self.left, 
                             self.top, 
                             self.right, 
-                            self.bottom, 
-                            fill=None if self.preview else self.fill)
+                            self.bottom,
+                            fill=None)
+        else:
+            cnv.create_rectangle(self.body.position.x - self.width/2, 
+                                self.body.position.y - self.height/2,
+                                self.body.position.x + self.width/2, 
+                                self.body.position.y + self.height/2, 
+                                fill=self.fill)

@@ -57,12 +57,21 @@ class Circle(Shape):
             self.top = self.bottom - size * (1 if dy >= 0 else -1)
         elif boundY == Bound.BOTTOM:
             self.bottom = self.top + size * (1 if dy >= 0 else -1)
+        
+        self.width = abs(self.right - self.left)
+        self.height = abs(self.bottom - self.top)
     
-
     def draw(self, cnv):
         super().draw(cnv)
-        cnv.create_oval(self.left, 
-                        self.top, 
-                        self.right, 
-                        self.bottom, 
-                        fill=None if self.preview else self.fill)
+        if self.preview:
+            cnv.create_oval(self.left, 
+                            self.top, 
+                            self.right, 
+                            self.bottom,
+                            fill=None)
+        else:
+            cnv.create_oval(self.body.position.x - self.width/2, 
+                            self.body.position.y - self.height/2,
+                            self.body.position.x + self.width/2, 
+                            self.body.position.y + self.height/2, 
+                            fill=self.fill)

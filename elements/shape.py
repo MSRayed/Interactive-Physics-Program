@@ -18,8 +18,6 @@ class Shape(ABC, Tool):
 
     body: pm.Body | None = None
     shape: pm.Shape
-    position: pm.Vec2d
-    orgPosition: pm.Vec2d
     
     def __init__(self, id : int, mass : float=10.0, friction : float=0.5, elasticity : float=0.5, body_type : int=pm.Body.DYNAMIC):
         Tool.__init__(self, id)
@@ -42,6 +40,9 @@ class Shape(ABC, Tool):
 
         self.anchor: Anchor = None
 
+        self.width: float = 0
+        self.height: float = 0
+
         # Position data
         self.left: float = None
         self.right: float = None
@@ -57,6 +58,9 @@ class Shape(ABC, Tool):
             self.top = newY
         if boundY == Bound.BOTTOM:
             self.bottom = newY
+        
+        self.width = abs(self.right - self.left)
+        self.height = abs(self.bottom - self.top)
 
     def if_valid(self):
         return self.left != self.right and self.top != self.bottom
@@ -67,15 +71,15 @@ class Shape(ABC, Tool):
         self.top += offset.y
         self.bottom += offset.y
 
+        self.position += offset
+        self.body.position = self.position
+
+        print(self.body.position)
+
         if self.anchor: self.anchor.move(offset)
     
     def update(self):
-        # The amount moved
-        offset = self.body.position - self.position
-
-        self.move(offset)
-
-        self.position = self.body.position
+        pass
     
     @abstractmethod
     def draw(self, cnv: Canvas):
@@ -84,11 +88,10 @@ class Shape(ABC, Tool):
     def place(self, space: pm.Space):
         self.body = pm.Body(body_type=self.body_type)
         self.position = pm.Vec2d((self.right + self.left) / 2, (self.top + self.bottom) / 2)
-        self.orgPosition = pm.Vec2d((self.right + self.left) / 2, (self.top + self.bottom) / 2)
         self.body.position = self.position
     
-    def reset(self) -> None:
-        self.body.position = self.orgPosition
+    def reset(self):
+        self.body.position = self.position
         self.body.angle = 0
         self.body.velocity = (0, 0)
         self.body.angular_velocity = 0
@@ -131,7 +134,9 @@ class Shape(ABC, Tool):
     
     def motion_event(self, event):
         if self.creationFlag:
+            # print("motion event")
             self.resize(Bound.RIGHT, Bound.BOTTOM, event.x, event.y)
+            pass
         else:
             if self.mouseOnCorner:
                 self.resize(*self.mouseOnCorner, event.x, event.y)
@@ -139,6 +144,7 @@ class Shape(ABC, Tool):
             
             offset = event - self.mouseRecordedPos
 
+            print("moving")
             self.move(offset)
 
             self.mouseRecordedPos = event

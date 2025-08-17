@@ -5,9 +5,14 @@ from abc import abstractmethod
 
 class Tool:
     cornerSize = 3
+    position: pm.Vec2d
 
     def __init__(self, id):
         self.id = id
+
+    @abstractmethod
+    def reset(self):
+        pass
 
     @abstractmethod
     def update(self):
