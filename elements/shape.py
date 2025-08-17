@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from tkinter import Canvas
 from abc import ABC, abstractmethod
 from utils import Bound, point_inside_rect
@@ -5,6 +8,9 @@ from utils import Bound, point_inside_rect
 from .tool import Tool
 
 import pymunk as pm
+
+if TYPE_CHECKING:
+    from .anchor import Anchor
 
 
 class Shape(ABC, Tool):
@@ -33,6 +39,14 @@ class Shape(ABC, Tool):
         self.mouseOnCorner = None
 
         self.mouseRecordedPos = None
+
+        self.anchor: Anchor = None
+
+        # Position data
+        self.left: float = None
+        self.right: float = None
+        self.top: float = None
+        self.bottom: float = None
     
     def resize(self, boundX: Bound, boundY: Bound, newX, newY):
         if boundX == Bound.LEFT:
@@ -52,6 +66,8 @@ class Shape(ABC, Tool):
         self.right += offset.x
         self.top += offset.y
         self.bottom += offset.y
+
+        if self.anchor: self.anchor.move(offset)
     
     def update(self):
         # The amount moved
@@ -65,7 +81,6 @@ class Shape(ABC, Tool):
     def draw(self, cnv: Canvas):
         pass
 
-    @abstractmethod
     def place(self, space: pm.Space):
         self.body = pm.Body(body_type=self.body_type)
         self.position = pm.Vec2d((self.right + self.left) / 2, (self.top + self.bottom) / 2)
@@ -92,7 +107,10 @@ class Shape(ABC, Tool):
                     return [boundX, boundY]
         return None
     
-
+    def point_inside(self, point):
+        px, py = point
+        return point_inside_rect(self.left-self.cornerSize, self.top-self.cornerSize, self.right+self.cornerSize, self.bottom+self.cornerSize, px, py)
+    
     def initiate(self, event):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
@@ -103,11 +121,13 @@ class Shape(ABC, Tool):
 
         self.preview = True
 
+        return True
+
     def click_event(self, event):
         self.mouseRecordedPos = event
 
         if self.get_mouse_on_corner(event):
-            self.mouseOnCorner = self.get_mouse_on_corner(event)
+            self.mouseOnCorner = self.get_mouse_on_corner(event)        
     
     def motion_event(self, event):
         if self.creationFlag:
@@ -131,6 +151,5 @@ class Shape(ABC, Tool):
             if self.if_valid():
                 self.preview = False
                 self.creationFlag = False
-                # ShapePanel().clear_selection()
         # Check for the orientation and fix if opposite
         self.fix_orientation()

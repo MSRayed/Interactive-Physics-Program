@@ -42,20 +42,24 @@ class DrawingBoard(Canvas, metaclass=Singleton):
     def left_click(self, event):
         mousePos = Vec2d(event.x, event.y)
 
-        for element in Simulation().objects:
-            if element.point_inside(mousePos):
-                self.currentElement = element
-                self.currentElement.click_event(mousePos)
-                return
+        if not ToolManager().currentTool:
+            for element in Simulation().objects:
+                if element.point_inside(mousePos):
+                    self.currentElement = element
+                    self.currentElement.click_event(mousePos)
+                    return
         
         # Creating shapes
         if ToolManager().currentTool:
             # If mouse not on any other element, than create a new one
-            self.creationFlag = True
-
             self.tempElement = ToolManager().currentTool(randint(0, 10000))
 
-            self.tempElement.initiate(Vec2d(event.x, event.y))
+            success = self.tempElement.initiate(Vec2d(event.x, event.y))
+
+            if not success: 
+                self.tempElement = None
+            else:
+                self.creationFlag = True
     
     @queue_redraw
     def left_mouse_motion(self, event):
@@ -71,8 +75,11 @@ class DrawingBoard(Canvas, metaclass=Singleton):
     def left_mouse_release(self, _):        
         if self.tempElement:
             self.tempElement.initialize()
+            print(self.tempElement)
             Simulation().add_object(self.tempElement)
             self.tempElement, self.currentElement = None, self.tempElement
+
+            ToolManager().clear()
         else:
             self.tempElement = None
         
@@ -87,4 +94,4 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         for element in Simulation().objects:
             element.draw(self)
         
-        if self.currentElement: self.selection.highlight(self.currentElement)
+        # if self.currentElement: self.selection.highlight(self.currentElement)

@@ -1,8 +1,44 @@
 import pymunk as pm
 
-from elements import Shape
+from tkinter import PhotoImage
+from tkinter.constants import CENTER
 
-class Anchor:
-    @staticmethod
-    def act(shape: Shape):
-        shape.body.body_type = pm.Body.STATIC
+from .tool import Tool
+from .shape import Shape
+
+from simulation import Simulation
+
+
+class Anchor(Tool):
+    def __init__(self, id):
+        Tool.__init__(self, id)
+        self.parent = None
+        # Relative position to the parent
+        self.position: pm.Vec2d = None
+        self.globalPos: pm.Vec2d = None
+
+        self.icon = PhotoImage(file="tool_menu_buttons_removed_background_1/anchor.png")
+    
+    def draw(self, cnv):
+        super().draw(cnv)
+        cnv.create_image(self.globalPos.x, self.globalPos.y, image=self.icon, anchor=CENTER)
+
+    def initiate(self, event):
+        for element in Simulation().objects:
+            if element.point_inside(event) and isinstance(element, Shape):
+                if not element.anchor:
+                    self.parent = element
+                    self.position = self.parent.position - event
+                    self.globalPos = event
+                    return True
+                else:
+                    pass
+        return False
+
+    def initialize(self):
+        self.parent.anchor = self
+        self.parent.body.body_type = pm.Body.STATIC
+    
+    def move(self, offset):
+        self.globalPos += offset
+        self.position += offset

@@ -55,6 +55,7 @@ class ShapePanel(Frame, metaclass=Singleton):
         self.buttons[index].config(bg="lightblue")
         self.active_index = index
         ToolManager().set_current_tool(self.selectedShape)
+        ToolManager().set_current_panel(self)
 
     def clear_selection(self):
         """Deselect all buttons."""
