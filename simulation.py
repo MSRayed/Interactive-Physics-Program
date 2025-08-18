@@ -1,10 +1,11 @@
 import pymunk as pm
 from typing import List, Callable
-from elements import Tool
 from utils import Singleton
+from elements import Tool
 
 import threading
 import time
+
 
 
 class Simulation(metaclass=Singleton):
@@ -69,5 +70,13 @@ class Simulation(metaclass=Singleton):
     def add_object(self, obj: Tool):
         self.objects.append(obj)
         obj.place(self.space)
+    
+    def object_at_pos(self, pos: pm.Vec2d, type = None):
+        for element in reversed(Simulation().objects):
+            if element.point_inside(pos):
+                if type:
+                    if isinstance(element, type): return element
+                else:
+                    return element
 
     

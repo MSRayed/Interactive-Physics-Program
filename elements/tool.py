@@ -9,6 +9,7 @@ class Tool:
 
     def __init__(self, id):
         self.id = id
+        self.mouseRecordedPos = None
 
     @abstractmethod
     def reset(self):

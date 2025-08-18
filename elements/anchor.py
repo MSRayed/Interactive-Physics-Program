@@ -6,6 +6,7 @@ from tkinter.constants import CENTER
 from .tool import Tool
 from .shape import Shape
 
+from utils import point_in_circle
 from simulation import Simulation
 
 
@@ -19,17 +20,22 @@ class Anchor(Tool):
     def draw(self, cnv):
         super().draw(cnv)
         cnv.create_image(self.position.x, self.position.y, image=self.icon, anchor=CENTER)
+    
+    def find_parent(self, event):
+        element = Simulation().object_at_pos(event, Shape)
+        if element:
+            if not element.anchor:
+                if self.parent:
+                    # Reset the older parent
+                    self.parent.body.body_type = pm.Body.DYNAMIC
+                
+                self.parent = element
+                return True
 
     def initiate(self, event):
-        for element in Simulation().objects:
-            if element.point_inside(event) and isinstance(element, Shape):
-                if not element.anchor:
-                    self.parent = element
-                    self.position = event
-                    self.orgPosition = event
-                    return True
-                else:
-                    pass
+        if self.find_parent(event):
+            self.position = event
+            return True
         return False
 
     def initialize(self):
@@ -41,3 +47,21 @@ class Anchor(Tool):
     
     def reset(self):
         pass
+
+    def motion_event(self, event):
+        offset = event - self.mouseRecordedPos
+
+        self.move(offset)
+
+        self.mouseRecordedPos = event
+
+        # To be improved later
+        if self.find_parent(self.position):
+            self.initialize()
+
+    def click_event(self, event):
+        self.mouseRecordedPos = event
+
+    def point_inside(self, point):
+        px, py = point
+        return point_in_circle(px, py, self.position.x, self.position.y, self.cornerSize * 2)

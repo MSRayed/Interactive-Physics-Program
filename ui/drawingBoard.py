@@ -43,11 +43,10 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         mousePos = Vec2d(event.x, event.y)
 
         if not ToolManager().currentTool:
-            for element in Simulation().objects:
-                if element.point_inside(mousePos):
-                    self.currentElement = element
-                    self.currentElement.click_event(mousePos)
-                    return
+            if Simulation().object_at_pos(mousePos):
+                self.currentElement = Simulation().object_at_pos(mousePos)
+                self.currentElement.click_event(mousePos)
+                return
         
         # Creating shapes
         if ToolManager().currentTool:
@@ -58,8 +57,6 @@ class DrawingBoard(Canvas, metaclass=Singleton):
 
             if not success: 
                 self.tempElement = None
-            else:
-                self.creationFlag = True
     
     @queue_redraw
     def left_mouse_motion(self, event):

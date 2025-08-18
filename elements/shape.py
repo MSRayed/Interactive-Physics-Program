@@ -74,8 +74,6 @@ class Shape(ABC, Tool):
         self.position += offset
         self.body.position = self.position
 
-        print(self.body.position)
-
         if self.anchor: self.anchor.move(offset)
     
     def update(self):
@@ -134,7 +132,6 @@ class Shape(ABC, Tool):
     
     def motion_event(self, event):
         if self.creationFlag:
-            # print("motion event")
             self.resize(Bound.RIGHT, Bound.BOTTOM, event.x, event.y)
             pass
         else:
@@ -144,7 +141,6 @@ class Shape(ABC, Tool):
             
             offset = event - self.mouseRecordedPos
 
-            print("moving")
             self.move(offset)
 
             self.mouseRecordedPos = event
