@@ -4,7 +4,7 @@ from tkinter import PhotoImage, Button
 
 from utils import Singleton
 
-from elements import Tool
+from elements.tool import Tool
 
 
 class ToolManager(metaclass=Singleton):

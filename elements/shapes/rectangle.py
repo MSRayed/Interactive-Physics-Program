@@ -1,4 +1,4 @@
-from elements import Shape
+from .shape import Shape
 
 import pymunk as pm
 

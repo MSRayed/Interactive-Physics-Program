@@ -1,22 +1,17 @@
 import math
-from tkinter import Frame
-from elements import Rectangle, Circle, Shape, Anchor
-from typing import List, Optional
+from elements.shapes import Rectangle, Circle, Shape, Anchor
+from typing import List
 
 from ui.toolManager import ToolManager
 
-from utils import Singleton
+from .panel import Panel
 
 SHAPES: List[Shape] = [Rectangle, Circle]
 
 
-class ShapePanel(Frame, metaclass=Singleton):
+class ShapePanel(Panel):
     def __init__(self, root=None, *args, **kwargs):
         super().__init__(root, *args, **kwargs)
-
-        self.images = []
-        self.buttons = []
-        self.active_index: Optional[int] = None  # None means no selection
 
         # Create shape buttons
         for i, shape in enumerate(SHAPES):
@@ -44,27 +39,9 @@ class ShapePanel(Frame, metaclass=Singleton):
         self.anchorButton.config(bg="lightblue")
         self.active_index = None
         ToolManager().set_current_tool(Anchor)
-
-    def set_active(self, index: int):
-        """Set a button active and reset others."""
-        # Clear previous selection
-        for btn in self.buttons:
-            btn.config(bg=self.cget("bg"))  # reset to default background
-
-        # Set new selection
-        self.buttons[index].config(bg="lightblue")
-        self.active_index = index
-        ToolManager().set_current_tool(self.selectedShape)
         ToolManager().set_current_panel(self)
 
-    def clear_selection(self):
-        """Deselect all buttons."""
-        for btn in self.buttons:
-            btn.config(bg=self.cget("bg"))
-        self.active_index = None
-
-    @property
-    def selectedShape(self):
+    def get_selected_tool(self):
         """Return the currently selected shape class or None."""
         if self.active_index is None or self.active_index >= len(SHAPES):
             return None  # None if nothing or anchor is selected

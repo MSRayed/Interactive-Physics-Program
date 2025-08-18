@@ -1,6 +1,6 @@
 from tkinter import Canvas
 
-from elements import Tool
+from elements.tool import Tool
 
 class Selection:
     def __init__(self, cnv: Canvas):

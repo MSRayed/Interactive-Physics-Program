@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import Tk
 
 from ui.drawingBoard import DrawingBoard
-from ui.shapePanel import ShapePanel
+from ui.panels.shapePanel import ShapePanel
+from ui.panels.jointPanel import JointPanel
 from ui.simulationControlPanel import SimulationControlPanel
 
 from simulation import Simulation
@@ -29,6 +30,9 @@ class InteractivePhysics(Tk):
 
         self.shapePanel = ShapePanel(self.toolsPanel)
         self.shapePanel.pack(padx=20, pady=20)
+
+        self.jointPanel = JointPanel(self.toolsPanel)
+        self.jointPanel.pack(padx=20, pady=0)
 
         # self.simulation.start()
 

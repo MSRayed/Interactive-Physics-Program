@@ -1,11 +1,10 @@
 import pymunk as pm
 from typing import List, Callable
 from utils import Singleton
-from elements import Tool
+from elements.tool import Tool
 
 import threading
 import time
-
 
 
 class Simulation(metaclass=Singleton):

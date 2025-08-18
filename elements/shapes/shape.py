@@ -5,7 +5,7 @@ from tkinter import Canvas
 from abc import ABC, abstractmethod
 from utils import Bound, point_inside_rect
 
-from .tool import Tool
+from elements.tool import Tool
 
 import pymunk as pm
 

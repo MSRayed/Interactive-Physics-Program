@@ -3,7 +3,7 @@ import pymunk as pm
 from tkinter import PhotoImage
 from tkinter.constants import CENTER
 
-from .tool import Tool
+from ..tool import Tool
 from .shape import Shape
 
 from utils import point_in_circle
@@ -44,9 +44,6 @@ class Anchor(Tool):
     
     def move(self, offset):
         self.position += offset
-    
-    def reset(self):
-        pass
 
     def motion_event(self, event):
         offset = event - self.mouseRecordedPos
@@ -65,3 +62,6 @@ class Anchor(Tool):
     def point_inside(self, point):
         px, py = point
         return point_in_circle(px, py, self.position.x, self.position.y, self.cornerSize * 2)
+    
+    def reset(self):
+        pass
