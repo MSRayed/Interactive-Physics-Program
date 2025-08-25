@@ -21,6 +21,8 @@ class Simulation(metaclass=Singleton):
         self._physicsRunning = False
         self._thread: threading.Thread = None
 
+        self._lock = threading.Lock()
+
     def start(self):
         """Start the simulation in a background thread."""
         if not self._running:
@@ -32,7 +34,7 @@ class Simulation(metaclass=Singleton):
         """Stop the simulation loop."""
         self._running = False
         if self._thread:
-            self._thread.join()
+            self._thread.join(0.01)
             self._thread = None
 
     def reset(self):
@@ -52,12 +54,11 @@ class Simulation(metaclass=Singleton):
 
         self.space.step(self.dt)
 
-        for obj in self.objects:
-            obj.update()
+        with self._lock:
+            for obj in self.objects:
+                obj.update()
 
-        # For other parts using the clock
-        for callback in self._observers:
-            callback()
+        for callback in self._observers: callback()
 
         elapsed = time.perf_counter() - start_time
         sleep_time = max(0, self.dt - elapsed)
@@ -71,11 +72,17 @@ class Simulation(metaclass=Singleton):
         obj.place(self.space)
     
     def object_at_pos(self, pos: pm.Vec2d, type = None):
-        for element in reversed(Simulation().objects):
-            if element.point_inside(pos):
-                if type:
-                    if isinstance(element, type): return element
-                else:
-                    return element
+        if not self.objects: return None
+        
+        inside = []
 
-    
+        for element in reversed(Simulation().objects):
+
+            if element.point_inside(pos): 
+                inside.append(element)
+                
+        if len(inside) == 0: return None
+        
+        elif len(inside) == 1: inside = inside[0]
+
+        return inside 

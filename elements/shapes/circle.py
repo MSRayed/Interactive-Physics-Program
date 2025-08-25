@@ -1,13 +1,13 @@
+import pymunk as pm
+
 from utils import Bound
 from .shape import Shape
-
-import pymunk as pm
 
 
 class Circle(Shape):
     NAME = "circle"
 
-    def __init__(self, id:int, mass:float=10.0, friction:float=0.5, elasticity:float=0.5, body_type:int=pm.Body.DYNAMIC):
+    def __init__(self, id:int, mass:float=10.0, friction:float=0.5, elasticity:float=1, body_type:int=pm.Body.DYNAMIC):
         Shape.__init__(self, id, mass, friction, elasticity, body_type)
         self.fill = "red"
     
@@ -16,7 +16,7 @@ class Circle(Shape):
 
         self.radius = (self.right - self.left) / 2
         self.shape = pm.Circle(self.body, self.radius)
-        # self.shape.group_id = self.group_id
+
         self.shape.collision_type = 1
         self.shape.mass = self.mass
         self.shape.friction = self.friction
@@ -60,6 +60,7 @@ class Circle(Shape):
         
         self.width = abs(self.right - self.left)
         self.height = abs(self.bottom - self.top)
+
     
     def draw(self, cnv):
         super().draw(cnv)

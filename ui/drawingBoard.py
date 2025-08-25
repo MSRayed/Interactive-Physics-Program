@@ -6,8 +6,10 @@ from utils import Singleton
 from simulation import Simulation
 
 from ui.selection import Selection
+from ui.panels.shapePanel import SHAPES
 
 from random import randint
+
 
 
 class DrawingBoard(Canvas, metaclass=Singleton):
@@ -31,7 +33,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         sim.register_observer(self.schedule_redraw)
 
     def schedule_redraw(self):
-        self.root.after(0, self.redraw)
+        self.after(0, self.redraw)
 
     def queue_redraw(func):
         def wrapper(self, *args, **kwargs):
@@ -43,11 +45,15 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         mousePos = Vec2d(event.x, event.y)
 
         if not ToolManager().currentTool:
-            if Simulation().object_at_pos(mousePos):
-                self.currentElement = Simulation().object_at_pos(mousePos)
+            element = Simulation().object_at_pos(mousePos)
+
+            element = element[0] if type(element) is list else element
+            
+            if element:
+                self.currentElement = element
                 self.currentElement.click_event(mousePos)
                 return
-        
+
         # Creating shapes
         if ToolManager().currentTool:
             # If mouse not on any other element, than create a new one
@@ -66,29 +72,31 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             self.tempElement.motion_event(mousePos)
             return
         
-        self.currentElement.motion_event(mousePos)
+        if self.currentElement:
+            self.currentElement.motion_event(mousePos)
+            return
 
     @queue_redraw
     def left_mouse_release(self, _):        
         if self.tempElement:
             self.tempElement.initialize()
-            print(self.tempElement)
+            #print(f'{self.tempElement = }')
             Simulation().add_object(self.tempElement)
             self.tempElement, self.currentElement = None, self.tempElement
 
+
+        if ToolManager().currentTool in SHAPES:
             ToolManager().clear()
-        else:
-            self.tempElement = None
         
-        if self.currentElement:
-            self.currentElement.release_event()
+        if self.currentElement: self.currentElement.release_event()
+
 
     def redraw(self):        
         self.delete("all")
         
         if self.tempElement: self.tempElement.draw(self)
 
-        for element in Simulation().objects:
-            element.draw(self)
+        with Simulation()._lock:
+            for element in Simulation().objects:
+                element.draw(self)
         
-        # if self.currentElement: self.selection.highlight(self.currentElement)

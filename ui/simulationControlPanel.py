@@ -51,4 +51,7 @@ class SimulationControlPanel(Frame, metaclass=Singleton):
 
     def reset_simulation(self):
         """Reset button pressed."""
+
+        self.stop_simulation()
+
         self.simulation.reset()

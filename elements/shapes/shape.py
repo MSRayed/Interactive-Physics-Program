@@ -22,7 +22,7 @@ class Shape(ABC, Tool):
     def __init__(self, id : int, mass : float=10.0, friction : float=0.5, elasticity : float=0.5, body_type : int=pm.Body.DYNAMIC):
         Tool.__init__(self, id)
 
-        self.fill: str = "red"
+        self.fill: str
         self.preview: bool = False
         
         self.mass = mass
@@ -31,7 +31,6 @@ class Shape(ABC, Tool):
         self.body_type = body_type
         self.z_index = 0
 
-        self.body_type = body_type
 
         self.creationFlag = False
         self.mouseOnCorner = None
@@ -109,9 +108,10 @@ class Shape(ABC, Tool):
         return None
     
     def point_inside(self, point):
-        px, py = point
-        return point_inside_rect(self.left-self.cornerSize, self.top-self.cornerSize, self.right+self.cornerSize, self.bottom+self.cornerSize, px, py)
-    
+        
+        return self.shape.point_query(point).distance <= 0
+
+
     def initiate(self, event):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
@@ -153,5 +153,6 @@ class Shape(ABC, Tool):
             if self.if_valid():
                 self.preview = False
                 self.creationFlag = False
+
         # Check for the orientation and fix if opposite
         self.fix_orientation()

@@ -11,7 +11,7 @@ class ToolManager(metaclass=Singleton):
     def __init__(self):
         self.imageCache = []
 
-        self.currentTool: type[Tool] = None
+        self.currentTool: Tool = None
         self.currentPanel = None
     
     def generate_tool_button(self, root, file, name, command: Callable):

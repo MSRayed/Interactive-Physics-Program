@@ -1,4 +1,5 @@
 import pymunk as pm
+from random import randint
 from tkinter import PhotoImage
 from tkinter.constants import CENTER
 
@@ -8,8 +9,8 @@ from utils import polar_to_cartesian
 from ui.toolManager import ToolManager
 
 
-class PinJoint(Tool):
-    NAME: str = "pin_joint"
+class RigidJoint(Tool):
+    NAME: str = "rigid_joint"
 
     def __init__(self, id):
         Tool.__init__(self, id)
@@ -24,7 +25,7 @@ class PinJoint(Tool):
         self.mouse_position = None
 
         self.icon = PhotoImage(
-            file="tool_menu_buttons_removed_background_1/pin_joint.png"
+            file="tool_menu_buttons_removed_background_1/rigid_joint.png"
             )
 
     def draw(self, cnv):
@@ -51,12 +52,12 @@ class PinJoint(Tool):
             anchor=CENTER
             )
 
+
     def find_parent(self, event):
         element = Simulation().object_at_pos(event)
 
         if element:
-            # In case multiple objects overlap, take the first two
-            self.parent = element[:2]
+            self.parent = element
             return True
 
     def initiate(self, event):
@@ -71,8 +72,17 @@ class PinJoint(Tool):
 
     def initialize(self):
 
-        body_a, body_b = self.parent
+        body_a, body_b, *body_n = self.parent
 
+        # If there are more than 2 bodies, make them a collision group
+        if body_n:
+            group_id = randint(1, 1000000)
+            for body in [body_a, body_b, *body_n]:
+
+                body.shape.filter = pm.ShapeFilter(
+                    group=group_id
+                    )
+        
         self.body_a['body'] = body_a
         self.body_b['body'] = body_b
 
@@ -84,18 +94,27 @@ class PinJoint(Tool):
 
         self.body_a['local_pos'] = local_pos_a
         self.body_b['local_pos'] = local_pos_b
-        
-        joint = pm.PinJoint(
+
+        joint1 = pm.PinJoint(
             a=body_a.body, 
             b=body_b.body,
             anchor_a=local_pos_a,
-            anchor_b=local_pos_b,
+            anchor_b=local_pos_b
             )
         
-        joint.collide_bodies = False
-        
-        Simulation().space.add(joint)
+        joint2 = pm.RotaryLimitJoint(
+            a=body_b.body, 
+            b=body_a.body,
+            min=0, 
+            max=0
+            )
+
+        joint1.collide_bodies = False
+        joint2.collide_bodies = False
+
+        Simulation().space.add(joint1, joint2)
         ToolManager().clear()
+
 
     def move(self, offset):
         self.position += offset
@@ -114,5 +133,6 @@ class PinJoint(Tool):
     def click_event(self, event):
         self.mouseRecordedPos = event
 
+    
     def reset(self):
         pass

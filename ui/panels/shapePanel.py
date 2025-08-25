@@ -6,7 +6,10 @@ from ui.toolManager import ToolManager
 
 from .panel import Panel
 
-SHAPES: List[Shape] = [Rectangle, Circle]
+SHAPES: List[Shape] = [
+    Rectangle, 
+    Circle,
+    ]
 
 
 class ShapePanel(Panel):

@@ -1,21 +1,25 @@
-from .shape import Shape
-
 import pymunk as pm
+
+from .shape import Shape
 
 
 class Rectangle(Shape):
     NAME = "rectangle"
 
-    def __init__(self, id:int, mass:float=10.0, friction:float=0.5, elasticity:float=0.5, body_type:int=pm.Body.DYNAMIC):
+    def __init__(self, id:int, mass:float=10.0, friction:float=0.5, elasticity:float=1, body_type:int=pm.Body.DYNAMIC):
         Shape.__init__(self, id, mass, friction, elasticity, body_type)
         self.fill = "lightgreen"
-    
+
     def place(self, space:pm.Space) -> None:
         super().place(space)
 
-        self.points = [(-self.width/2, -self.height/2), (self.width/2, -self.height/2), (self.width/2, self.height/2), (-self.width/2, self.height/2)]
-        self.shape = pm.shapes.Poly(self.body, self.points)
-        # self.shape.group_id = self.group_id
+        self.points = [(-self.width/2, -self.height/2), 
+                       (self.width/2, -self.height/2), 
+                       (self.width/2, self.height/2), 
+                       (-self.width/2, self.height/2)]
+        
+        self.shape = pm.Poly.create_box(self.body, (self.width, self.height))
+
         self.shape.collision_type = 1
         self.shape.mass = self.mass
         self.shape.friction = self.friction
@@ -26,16 +30,20 @@ class Rectangle(Shape):
 
     def draw(self, cnv):
         super().draw(cnv)
-        super().draw(cnv)
         if self.preview:
             cnv.create_rectangle(self.left, 
-                            self.top, 
-                            self.right, 
-                            self.bottom,
-                            fill=None)
+                                self.top, 
+                                self.right, 
+                                self.bottom,
+                                fill=None)
         else:
-            cnv.create_rectangle(self.body.position.x - self.width/2, 
-                                self.body.position.y - self.height/2,
-                                self.body.position.x + self.width/2, 
-                                self.body.position.y + self.height/2, 
-                                fill=self.fill)
+            
+            points = []
+            for v in self.shape.get_vertices():
+                points.append(self.body.local_to_world(v))
+            
+            coords = []
+            for p in points:
+                coords.extend([p.x, p.y])
+            cnv.create_polygon(coords, fill=self.fill, outline="black", width=1)
+ 

@@ -2,11 +2,17 @@ import math
 
 from .panel import Panel
 
-from elements.joints import PinJoint
+from elements.joints import PinJoint, Spring, Rope, Gear, RigidJoint
 
 from ui.toolManager import ToolManager
 
-JOINTS = [PinJoint]
+JOINTS = [
+    PinJoint, 
+    RigidJoint,
+    Spring, 
+    Rope, 
+    Gear, 
+    ]
 
 
 class JointPanel(Panel):

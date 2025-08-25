@@ -4,10 +4,9 @@ from tkinter import PhotoImage
 from tkinter.constants import CENTER
 
 from ..tool import Tool
-from .shape import Shape
 
-from utils import point_in_circle
 from simulation import Simulation
+from ui.toolManager import ToolManager
 
 
 class Anchor(Tool):
@@ -22,12 +21,14 @@ class Anchor(Tool):
         cnv.create_image(self.position.x, self.position.y, image=self.icon, anchor=CENTER)
     
     def find_parent(self, event):
-        element = Simulation().object_at_pos(event, Shape)
+        element = Simulation().object_at_pos(event)
         if element:
             if not element.anchor:
                 if self.parent:
                     # Reset the older parent
                     self.parent.body.body_type = pm.Body.DYNAMIC
+                    self.parent.anchor = None
+                    self.parent = None
                 
                 self.parent = element
                 return True
@@ -41,6 +42,8 @@ class Anchor(Tool):
     def initialize(self):
         self.parent.anchor = self
         self.parent.body.body_type = pm.Body.KINEMATIC
+        ToolManager().clear()
+
     
     def move(self, offset):
         self.position += offset
@@ -59,9 +62,6 @@ class Anchor(Tool):
     def click_event(self, event):
         self.mouseRecordedPos = event
 
-    def point_inside(self, point):
-        px, py = point
-        return point_in_circle(px, py, self.position.x, self.position.y, self.cornerSize * 2)
     
     def reset(self):
         pass
