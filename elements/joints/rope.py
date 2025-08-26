@@ -18,6 +18,8 @@ class Rope(Tool, metaclass=Singleton):
             'local_pos': None # Click position in local coordinates
             }
         
+        self.joint: pm.Constraint = None
+
         self.body_b = {'body': None, 'pos': None, 'local_pos': None}
 
         self.mouse_position = None
@@ -73,6 +75,7 @@ class Rope(Tool, metaclass=Singleton):
 
         elif self.find_parent(event):
             self.mouse_position = event
+            self.position = event
             return True
 
     def initialize(self):
@@ -106,7 +109,7 @@ class Rope(Tool, metaclass=Singleton):
                 - self.body_b['local_pos']
                 ).length
 
-            joint = pm.SlideJoint(
+            self.joint = pm.SlideJoint(
                 a=self.body_a['body'].body, 
                 b=self.body_b['body'].body, 
                 anchor_a=self.body_a['local_pos'],
@@ -115,7 +118,8 @@ class Rope(Tool, metaclass=Singleton):
                 max=max_dist
                 )
             
-            Simulation().space.add(joint)
+            Simulation().space.add(self.joint)
+            Simulation().delete_object(self)
             ToolManager().clear()
             Singleton._instances.pop(self.__class__, None) 
 
@@ -141,3 +145,9 @@ class Rope(Tool, metaclass=Singleton):
 
     def draw_rope(self, canvas, x1, y1, x2, y2):
         canvas.create_line(x1, y1, x2, y2, fill="black", width=2)
+    
+    def delete(self, space: pm.Space):
+        # Check if the joint exists in the space
+        if self.joint in space.constraints:
+            space.remove(self.joint)
+            self.joint = None

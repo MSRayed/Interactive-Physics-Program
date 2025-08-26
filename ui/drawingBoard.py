@@ -23,12 +23,15 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         self.bind("<B1-Motion>", self.left_mouse_motion)
         self.bind("<ButtonRelease-1>", self.left_mouse_release)
         self.bind("<KeyPress>", self.handle_key)
+        self.bind("<KeyRelease>", self.handle_key_release)
 
         self.currentElement: Tool = None
 
         self.tempElement: Tool = None
 
         self.selection = Selection(self)
+
+        self.shift_hold = False
 
         # Register redraw callback with simulation
         sim = Simulation()
@@ -48,8 +51,15 @@ class DrawingBoard(Canvas, metaclass=Singleton):
     @queue_redraw
     def handle_key(self, event):
         if event.keysym == "Delete":
+            self.currentElement.delete(Simulation().space)
             Simulation().delete_object(self.currentElement)
             self.currentElement = None
+        elif event.keysym == "Shift_L" or event.keysym == "Shift_R":
+            self.shift_hold = True
+    
+    def handle_key_release(self, event):
+        if event.keysym == "Shift_L" or event.keysym == "Shift_R":
+            self.shift_hold = False
 
     def left_click(self, event):
         mousePos = Vec2d(event.x, event.y)
@@ -88,7 +98,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             return
 
     @queue_redraw
-    def left_mouse_release(self, _):        
+    def left_mouse_release(self, _):
         if self.tempElement:
             self.tempElement.initialize()
             #print(f'{self.tempElement = }')

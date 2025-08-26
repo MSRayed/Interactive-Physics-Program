@@ -16,6 +16,8 @@ class Gear(Tool, metaclass=Singleton):
 
         self.ratio = 10.0
 
+        self.joint: pm.Constraint = None
+
         self.body_a = {
             'body': None, # Body object
             'pos': None, # Body position in world coordinates
@@ -69,10 +71,10 @@ class Gear(Tool, metaclass=Singleton):
 
         elif self.find_parent(event):
             self.mouse_position = event
+            self.position = self.parent.position
             return True
 
     def initialize(self):
-
         # if multiple bodies are piled up, select the top one
         if type(self.parent) is list:
             self.parent = self.parent[0]
@@ -82,21 +84,20 @@ class Gear(Tool, metaclass=Singleton):
         if not self.body_a['body']:
             self.body_a['body'] = body
             self.body_a['pos'] = body.position
-            
 
         elif not self.body_b['body']:
             self.body_b['body'] = body
             self.body_b['pos'] = body.position
             
-            joint = pm.GearJoint(
+            self.joint = pm.GearJoint(
                 self.body_a['body'].body, 
                 self.body_b['body'].body,
                 phase=0, 
                 ratio=self.ratio
                 )
-            
 
-            Simulation().space.add(joint)    
+            Simulation().space.add(self.joint)
+            Simulation().delete_object(self)
             ToolManager().clear()
             Singleton._instances.pop(self.__class__, None) 
 
@@ -119,3 +120,9 @@ class Gear(Tool, metaclass=Singleton):
     
     def reset(self):
         pass
+    
+    def delete(self, space: pm.Space):
+        # Check if the joint exists in the space
+        if self.joint in space.constraints:
+            space.remove(self.joint)
+            self.joint = None

@@ -158,3 +158,12 @@ class Shape(ABC, Tool):
 
         # Check for the orientation and fix if opposite
         self.fix_orientation()
+    
+    def delete(self, space: pm.Space):        
+        if self.shape and self.shape in space.shapes:
+            space.remove(self.shape)
+            self.shape = None  # optional: clear reference
+
+        if self.body and self.body in space.bodies:
+            space.remove(self.body)
+            self.body = None  # optional: clear reference

@@ -20,6 +20,8 @@ class Spring(Tool, metaclass=Singleton):
             'local_pos': None # Click position in local coordinates
             }
         
+        self.joint: pm.Constraint = None
+        
         self.body_b = {'body': None, 'pos': None, 'local_pos': None}
 
         self.mouse_position = None
@@ -75,10 +77,10 @@ class Spring(Tool, metaclass=Singleton):
 
         elif self.find_parent(event):
             self.mouse_position = event
+            self.position = event
             return True
 
     def initialize(self):
-        
         # if multiple bodies are piled up, select the top one
         if type(self.parent) is list:
             self.parent = self.parent[0]
@@ -113,7 +115,7 @@ class Spring(Tool, metaclass=Singleton):
             stiffness = 1000  # You can adjust this value
             damping = 1    # You can adjust this value
 
-            joint = pm.DampedSpring(
+            self.joint = pm.DampedSpring(
                 a=self.body_a['body'].body, 
                 b=self.body_b['body'].body, 
                 anchor_a=self.body_a['local_pos'],
@@ -123,7 +125,8 @@ class Spring(Tool, metaclass=Singleton):
                 damping=damping
                 )
             
-            Simulation().space.add(joint)    
+            Simulation().space.add(self.joint)
+            Simulation().delete_object(self)
             ToolManager().clear()
             Singleton._instances.pop(self.__class__, None) 
 
@@ -178,3 +181,9 @@ class Spring(Tool, metaclass=Singleton):
 
         flat_points = [coord for p in points for coord in p]
         canvas.create_line(*flat_points, fill="black", width=2)
+    
+    def delete(self, space: pm.Space):
+        # Check if the joint exists in the space
+        if self.joint in space.constraints:
+            space.remove(self.joint)
+            self.joint = None

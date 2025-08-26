@@ -78,3 +78,8 @@ class Anchor(Tool):
     
     def reset(self):
         pass
+
+    def delete(self, space: pm.Space):
+        self.parent.body.body_type = pm.Body.DYNAMIC
+        self.parent.anchor = None
+        self.parent = None

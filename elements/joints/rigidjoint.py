@@ -1,3 +1,5 @@
+from typing import List
+
 import pymunk as pm
 from random import randint
 from tkinter import PhotoImage
@@ -19,6 +21,8 @@ class RigidJoint(Tool):
             'pos': None, # Body position in world coordinates
             'local_pos': None # Click position in local coordinates
             }
+        
+        self.joints: List[pm.Constraint] = []
         
         self.body_b = {'body': None, 'pos': None, 'local_pos': None}
 
@@ -52,7 +56,6 @@ class RigidJoint(Tool):
             anchor=CENTER
             )
 
-
     def find_parent(self, event):
         element = Simulation().object_at_pos(event)
 
@@ -68,6 +71,7 @@ class RigidJoint(Tool):
 
         elif self.find_parent(event):
             self.mouse_position = event
+            self.position = event
             return True
 
     def initialize(self):
@@ -108,6 +112,9 @@ class RigidJoint(Tool):
             min=0, 
             max=0
             )
+        
+        self.joints.append(joint1)
+        self.joints.append(joint2)
 
         joint1.collide_bodies = False
         joint2.collide_bodies = False
@@ -133,6 +140,12 @@ class RigidJoint(Tool):
     def click_event(self, event):
         self.mouseRecordedPos = event
 
-    
     def reset(self):
         pass
+
+    def delete(self, space: pm.Space):
+        # Check if the joint exists in the space
+        for joint in self.joints:
+            if joint in space.constraints:
+                space.remove(joint)
+                self.joint = None

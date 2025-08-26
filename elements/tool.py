@@ -51,6 +51,10 @@ class Tool:
     @abstractmethod
     def move(self, offset: pm.Vec2d):
         pass
+    
+    @abstractmethod
+    def delete(self, space: pm.Space):
+        pass
 
     @abstractmethod
     def point_inside_shape(self, point):

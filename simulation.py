@@ -70,17 +70,7 @@ class Simulation(metaclass=Singleton):
 
     def delete_object(self, obj: Tool):
         print("Deleting ", obj)
-        if obj in self.objects:
-            # Remove shapes and body from pymunk.Space safely
-            try:
-                if hasattr(obj, "shape") and obj.shape in self.space.shapes:
-                    self.space.remove(obj.shape)
-                if hasattr(obj, "body") and obj.body in self.space.bodies:
-                    self.space.remove(obj.body)
-            except Exception as e:
-                print("Error removing object:", e)
-
-            self.objects.remove(obj)
+        self.objects.remove(obj)
     
     def object_at_pos(self, pos: pm.Vec2d, check_bound = False):
         if not self.objects: return None

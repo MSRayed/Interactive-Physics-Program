@@ -19,6 +19,8 @@ class PinJoint(Tool):
             'local_pos': None # Click position in local coordinates
             }
         
+        self.joint: pm.Constraint = None
+        
         self.body_b = {'body': None, 'pos': None, 'local_pos': None}
 
         self.mouse_position = None
@@ -85,16 +87,16 @@ class PinJoint(Tool):
         self.body_a['local_pos'] = local_pos_a
         self.body_b['local_pos'] = local_pos_b
         
-        joint = pm.PinJoint(
+        self.joint = pm.PinJoint(
             a=body_a.body, 
             b=body_b.body,
             anchor_a=local_pos_a,
             anchor_b=local_pos_b,
             )
         
-        joint.collide_bodies = False
+        self.joint.collide_bodies = False
         
-        Simulation().space.add(joint)
+        Simulation().space.add(self.joint)
         ToolManager().clear()
 
     def move(self, offset):
@@ -116,3 +118,9 @@ class PinJoint(Tool):
 
     def reset(self):
         pass
+    
+    def delete(self, space: pm.Space):
+        # Check if the joint exists in the space
+        if self.joint in space.constraints:
+            space.remove(self.joint)
+            self.joint = None
