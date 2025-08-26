@@ -21,17 +21,32 @@ class Anchor(Tool):
         cnv.create_image(self.position.x, self.position.y, image=self.icon, anchor=CENTER)
     
     def find_parent(self, event):
-        element = Simulation().object_at_pos(event)
-        if element:
+        result = Simulation().object_at_pos(event)
+
+        # Normalize to list
+        if not result:
+            return False
+        if not isinstance(result, list):
+            elements = [result]
+        else:
+            elements = result
+
+        # Filter out self
+        elements = [el for el in elements if el is not self]
+
+        if elements:
+            element = elements[0]
             if not element.anchor:
                 if self.parent:
                     # Reset the older parent
                     self.parent.body.body_type = pm.Body.DYNAMIC
                     self.parent.anchor = None
                     self.parent = None
-                
+
                 self.parent = element
                 return True
+
+        return False
 
     def initiate(self, event):
         if self.find_parent(event):
@@ -43,7 +58,6 @@ class Anchor(Tool):
         self.parent.anchor = self
         self.parent.body.body_type = pm.Body.KINEMATIC
         ToolManager().clear()
-
     
     def move(self, offset):
         self.position += offset
@@ -61,7 +75,6 @@ class Anchor(Tool):
 
     def click_event(self, event):
         self.mouseRecordedPos = event
-
     
     def reset(self):
         pass

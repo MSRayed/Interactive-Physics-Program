@@ -32,13 +32,14 @@ class Rectangle(Shape):
     
     def reset(self):
         super().reset()
-        
+
         self.points = [(-self.width/2, -self.height/2), 
                        (self.width/2, -self.height/2), 
                        (self.width/2, self.height/2), 
                        (-self.width/2, self.height/2)]
         
-        self.shape = pm.Poly.create_box(self.body, (self.width, self.height))
+        # Update vertices instead of creating a new shape
+        self.shape.unsafe_set_vertices(self.points)
 
         self.shape.collision_type = 1
         self.shape.mass = self.mass

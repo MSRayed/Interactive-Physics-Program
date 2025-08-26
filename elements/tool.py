@@ -1,6 +1,7 @@
 import pymunk as pm
 
 from abc import abstractmethod
+from utils import point_inside_circle
 
 
 class Tool:
@@ -57,4 +58,4 @@ class Tool:
 
     @abstractmethod
     def point_inside_bounds(self, point):
-        pass
+        return point_inside_circle(point.x, point.y, self.position.x, self.position.y, self.cornerSize*2)
