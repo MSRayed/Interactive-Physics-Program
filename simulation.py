@@ -64,8 +64,23 @@ class Simulation(metaclass=Singleton):
         self._observers.append(callback)
 
     def add_object(self, obj: Tool):
+        print("Adding ", obj)
         self.objects.append(obj)
         obj.place(self.space)
+
+    def delete_object(self, obj: Tool):
+        print("Deleting ", obj)
+        if obj in self.objects:
+            # Remove shapes and body from pymunk.Space safely
+            try:
+                if hasattr(obj, "shape") and obj.shape in self.space.shapes:
+                    self.space.remove(obj.shape)
+                if hasattr(obj, "body") and obj.body in self.space.bodies:
+                    self.space.remove(obj.body)
+            except Exception as e:
+                print("Error removing object:", e)
+
+            self.objects.remove(obj)
     
     def object_at_pos(self, pos: pm.Vec2d, check_bound = False):
         if not self.objects: return None
@@ -83,7 +98,5 @@ class Simulation(metaclass=Singleton):
         if len(inside) == 0: return None
         
         elif len(inside) == 1: inside = inside[0]
-
-        print(inside)
 
         return inside

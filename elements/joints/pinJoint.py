@@ -67,10 +67,10 @@ class PinJoint(Tool):
 
         elif self.find_parent(event):
             self.mouse_position = event
+            self.position = event
             return True
 
     def initialize(self):
-
         body_a, body_b = self.parent
 
         self.body_a['body'] = body_a

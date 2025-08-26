@@ -22,6 +22,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         self.bind("<Button-1>", self.left_click)
         self.bind("<B1-Motion>", self.left_mouse_motion)
         self.bind("<ButtonRelease-1>", self.left_mouse_release)
+        self.bind("<KeyPress>", self.handle_key)
 
         self.currentElement: Tool = None
 
@@ -33,6 +34,8 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         sim = Simulation()
         sim.register_observer(self.schedule_redraw)
 
+        self.focus_set()
+
     def schedule_redraw(self):
         self.after(0, self.redraw)
 
@@ -42,6 +45,12 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             self.redraw()
         return wrapper
     
+    @queue_redraw
+    def handle_key(self, event):
+        if event.keysym == "Delete":
+            Simulation().delete_object(self.currentElement)
+            self.currentElement = None
+
     def left_click(self, event):
         mousePos = Vec2d(event.x, event.y)
 
@@ -52,6 +61,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             
             if element:
                 self.currentElement = element
+                print(self.currentElement)
                 self.currentElement.click_event(mousePos)
                 return
 
@@ -100,7 +110,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             if not Simulation()._running:
                 if isinstance(self.currentElement, Shape):
                     self.selection.highlight(self.currentElement)
-                    
+
             for element in Simulation().objects:
                 element.draw(self)
         
