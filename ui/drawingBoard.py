@@ -1,15 +1,15 @@
 from tkinter import Canvas
 from pymunk.vec2d import Vec2d
 
-from ui.toolManager import ToolManager
 from utils import Singleton
 from simulation import Simulation
+from elements.tool import Tool
 
+from ui.toolManager import ToolManager
 from ui.selection import Selection
 from ui.panels.shapePanel import SHAPES
 
 from random import randint
-
 
 
 class DrawingBoard(Canvas, metaclass=Singleton):
@@ -22,9 +22,9 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         self.bind("<B1-Motion>", self.left_mouse_motion)
         self.bind("<ButtonRelease-1>", self.left_mouse_release)
 
-        self.currentElement = None
+        self.currentElement: Tool = None
 
-        self.tempElement = None
+        self.tempElement: Tool = None
 
         self.selection = Selection(self)
 
@@ -84,11 +84,12 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             Simulation().add_object(self.tempElement)
             self.tempElement, self.currentElement = None, self.tempElement
 
-
         if ToolManager().currentTool in SHAPES:
             ToolManager().clear()
         
-        if self.currentElement: self.currentElement.release_event()
+        if self.currentElement: 
+            self.currentElement.release_event()
+            self.currentElement = None
 
 
     def redraw(self):        

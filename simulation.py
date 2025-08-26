@@ -77,12 +77,13 @@ class Simulation(metaclass=Singleton):
         inside = []
 
         for element in reversed(Simulation().objects):
-
             if element.point_inside(pos): 
                 inside.append(element)
                 
         if len(inside) == 0: return None
         
         elif len(inside) == 1: inside = inside[0]
+
+        print(inside)
 
         return inside 

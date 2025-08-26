@@ -2,6 +2,8 @@ import pymunk as pm
 
 from .shape import Shape
 
+from utils import point_inside_rect
+
 
 class Rectangle(Shape):
     NAME = "rectangle"
@@ -46,4 +48,8 @@ class Rectangle(Shape):
             for p in points:
                 coords.extend([p.x, p.y])
             cnv.create_polygon(coords, fill=self.fill, outline="black", width=1)
+    
+    def point_inside(self, point):
+        return point_inside_rect(self.left, self.top, self.right, self.bottom, point.x, point.y)
+
  

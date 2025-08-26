@@ -1,6 +1,6 @@
 import pymunk as pm
 
-from utils import Bound
+from utils import Bound, point_inside_circle
 from .shape import Shape
 
 
@@ -76,3 +76,6 @@ class Circle(Shape):
                             self.body.position.x + self.width/2, 
                             self.body.position.y + self.height/2, 
                             fill=self.fill)
+
+    def point_inside(self, point):
+        return point_inside_circle(point.x, point.y, self.body.position.x, self.body.position.y, self.width/2)

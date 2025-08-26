@@ -107,11 +107,6 @@ class Shape(ABC, Tool):
                     return [boundX, boundY]
         return None
     
-    def point_inside(self, point):
-        
-        return self.shape.point_query(point).distance <= 0
-
-
     def initiate(self, event):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
