@@ -31,7 +31,6 @@ class Shape(ABC, Tool):
         self.body_type = body_type
         self.z_index = 0
 
-
         self.creationFlag = False
         self.mouseOnCorner = None
 
@@ -60,6 +59,10 @@ class Shape(ABC, Tool):
         
         self.width = abs(self.right - self.left)
         self.height = abs(self.bottom - self.top)
+        self.position = pm.Vec2d((self.left + self.right)/2, (self.top + self.bottom)/2)
+        
+        if self.body:
+            self.reset()
 
     def if_valid(self):
         return self.left != self.right and self.top != self.bottom
@@ -74,6 +77,9 @@ class Shape(ABC, Tool):
         self.body.position = self.position
 
         if self.anchor: self.anchor.move(offset)
+    
+    def point_inside_bounds(self, point):
+        return point_inside_rect(self.left-self.cornerSize, self.top-self.cornerSize, self.right+self.cornerSize, self.bottom+self.cornerSize, point.x, point.y)
     
     def update(self):
         pass
@@ -104,6 +110,7 @@ class Shape(ABC, Tool):
         for (x, boundX) in zip([self.left, self.right], [Bound.LEFT, Bound.RIGHT]):
             for (y, boundY) in zip([self.top, self.bottom], [Bound.TOP, Bound.BOTTOM]):
                 if point_inside_rect(x-self.cornerSize, y-self.cornerSize, x+self.cornerSize, y+self.cornerSize, mouse.x, mouse.y):
+                    print([boundX, boundY])
                     return [boundX, boundY]
         return None
     

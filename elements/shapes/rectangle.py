@@ -29,6 +29,21 @@ class Rectangle(Shape):
 
         if (self.body):
             space.add(self.body, self.shape)
+    
+    def reset(self):
+        super().reset()
+        
+        self.points = [(-self.width/2, -self.height/2), 
+                       (self.width/2, -self.height/2), 
+                       (self.width/2, self.height/2), 
+                       (-self.width/2, self.height/2)]
+        
+        self.shape = pm.Poly.create_box(self.body, (self.width, self.height))
+
+        self.shape.collision_type = 1
+        self.shape.mass = self.mass
+        self.shape.friction = self.friction
+        self.shape.elasticity = self.elasticity
 
     def draw(self, cnv):
         super().draw(cnv)
@@ -39,7 +54,6 @@ class Rectangle(Shape):
                                 self.bottom,
                                 fill=None)
         else:
-            
             points = []
             for v in self.shape.get_vertices():
                 points.append(self.body.local_to_world(v))
@@ -49,7 +63,7 @@ class Rectangle(Shape):
                 coords.extend([p.x, p.y])
             cnv.create_polygon(coords, fill=self.fill, outline="black", width=1)
     
-    def point_inside(self, point):
+    def point_inside_shape(self, point):
         return point_inside_rect(self.left, self.top, self.right, self.bottom, point.x, point.y)
 
  

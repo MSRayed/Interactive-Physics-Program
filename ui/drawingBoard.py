@@ -4,6 +4,7 @@ from pymunk.vec2d import Vec2d
 from utils import Singleton
 from simulation import Simulation
 from elements.tool import Tool
+from elements.shapes import Shape
 
 from ui.toolManager import ToolManager
 from ui.selection import Selection
@@ -45,7 +46,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         mousePos = Vec2d(event.x, event.y)
 
         if not ToolManager().currentTool:
-            element = Simulation().object_at_pos(mousePos)
+            element = Simulation().object_at_pos(mousePos, check_bound=True)
 
             element = element[0] if type(element) is list else element
             
@@ -89,8 +90,6 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         
         if self.currentElement: 
             self.currentElement.release_event()
-            self.currentElement = None
-
 
     def redraw(self):        
         self.delete("all")
@@ -98,6 +97,10 @@ class DrawingBoard(Canvas, metaclass=Singleton):
         if self.tempElement: self.tempElement.draw(self)
 
         with Simulation()._lock:
+            if not Simulation()._running:
+                if isinstance(self.currentElement, Shape):
+                    self.selection.highlight(self.currentElement)
+                    
             for element in Simulation().objects:
                 element.draw(self)
         

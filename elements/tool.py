@@ -52,5 +52,9 @@ class Tool:
         pass
 
     @abstractmethod
-    def point_inside(self, point):
+    def point_inside_shape(self, point):
+        pass
+
+    @abstractmethod
+    def point_inside_bounds(self, point):
         pass

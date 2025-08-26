@@ -24,28 +24,24 @@ class Simulation(metaclass=Singleton):
         self._lock = threading.Lock()
 
     def start(self):
-        """Start the simulation in a background thread."""
         if not self._running:
             self._running = True
             self._thread = threading.Thread(target=self._loop, daemon=True)
             self._thread.start()
 
     def stop(self):
-        """Stop the simulation loop."""
         self._running = False
         if self._thread:
             self._thread.join(0.01)
             self._thread = None
 
     def reset(self):
-        """Reset every object back to original state"""
         for obj in self.objects:
             obj.reset()
         
         self.step()
 
     def _loop(self):
-        """Simulation update loop running in background."""
         while self._running:
             self.step()
 
@@ -71,14 +67,18 @@ class Simulation(metaclass=Singleton):
         self.objects.append(obj)
         obj.place(self.space)
     
-    def object_at_pos(self, pos: pm.Vec2d, type = None):
+    def object_at_pos(self, pos: pm.Vec2d, check_bound = False):
         if not self.objects: return None
         
         inside = []
 
         for element in reversed(Simulation().objects):
-            if element.point_inside(pos): 
-                inside.append(element)
+            if check_bound:
+                if element.point_inside_bounds(pos):
+                    inside.append(element)
+            else:
+                if element.point_inside_shape(pos): 
+                    inside.append(element)
                 
         if len(inside) == 0: return None
         
@@ -86,4 +86,4 @@ class Simulation(metaclass=Singleton):
 
         print(inside)
 
-        return inside 
+        return inside

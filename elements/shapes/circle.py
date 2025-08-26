@@ -25,6 +25,15 @@ class Circle(Shape):
         if (self.body):
             space.add(self.body, self.shape)
     
+    def reset(self):
+        self.radius = (self.right - self.left) / 2
+        self.shape = pm.Circle(self.body, self.radius)
+
+        self.shape.collision_type = 1
+        self.shape.mass = self.mass
+        self.shape.friction = self.friction
+        self.shape.elasticity = self.elasticity
+    
     def resize(self, boundX, boundY, newX, newY):
         if boundX == Bound.LEFT:
             anchor_x = self.right
@@ -61,7 +70,6 @@ class Circle(Shape):
         self.width = abs(self.right - self.left)
         self.height = abs(self.bottom - self.top)
 
-    
     def draw(self, cnv):
         super().draw(cnv)
         if self.preview:
@@ -77,5 +85,5 @@ class Circle(Shape):
                             self.body.position.y + self.height/2, 
                             fill=self.fill)
 
-    def point_inside(self, point):
+    def point_inside_shape(self, point):
         return point_inside_circle(point.x, point.y, self.body.position.x, self.body.position.y, self.width/2)
