@@ -80,7 +80,7 @@ class DrawingBoard(Canvas, metaclass=Singleton):
             # If mouse not on any other element, than create a new one
             self.tempElement = ToolManager().currentTool(randint(0, 10000))
 
-            success = self.tempElement.initiate(Vec2d(event.x, event.y))
+            success = self.tempElement.initiate(Vec2d(event.x, event.y), self.shift_hold)
 
             if not success: 
                 self.tempElement = None
@@ -113,8 +113,6 @@ class DrawingBoard(Canvas, metaclass=Singleton):
 
     def redraw(self):        
         self.delete("all")
-        
-        if self.tempElement: self.tempElement.draw(self)
 
         with Simulation()._lock:
             if not Simulation()._running:
@@ -123,4 +121,6 @@ class DrawingBoard(Canvas, metaclass=Singleton):
 
             for element in Simulation().objects:
                 element.draw(self)
+        
+        if self.tempElement: self.tempElement.draw(self)
         

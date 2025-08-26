@@ -63,15 +63,19 @@ class RigidJoint(Tool):
             self.parent = element
             return True
 
-    def initiate(self, event):
+    def initiate(self, event, at_center):
         num_objects = len(Simulation().objects)
         if num_objects < 2:
             print("Not enough objects to create a joint.")
             return False
 
         elif self.find_parent(event):
-            self.mouse_position = event
-            self.position = event
+            if at_center:
+                self.position = self.parent[0].position
+                self.mouse_position = self.parent[0].position
+            else:
+                self.position = event
+                self.mouse_position = event
             return True
 
     def initialize(self):

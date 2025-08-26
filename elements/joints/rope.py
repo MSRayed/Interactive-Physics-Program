@@ -65,25 +65,29 @@ class Rope(Tool, metaclass=Singleton):
 
         if element:
             self.parent = element
+            
+            # if multiple bodies are piled up, select the top one
+            if type(self.parent) is list:
+                self.parent = self.parent[0]
+            
             return True
 
-    def initiate(self, event):
+    def initiate(self, event, at_center):
         num_objects = len(Simulation().objects)
         if num_objects < 2:
             print("Not enough objects to create a joint.")
             return False
 
         elif self.find_parent(event):
-            self.mouse_position = event
-            self.position = event
+            if at_center:
+                self.position = self.parent.position
+                self.mouse_position = self.parent.position
+            else:
+                self.position = event
+                self.mouse_position = event
             return True
 
     def initialize(self):
-        
-        # if multiple bodies are piled up, select the top one
-        if type(self.parent) is list:
-            self.parent = self.parent[0]
-            
         body = self.parent
 
         if not self.body_a['body']:

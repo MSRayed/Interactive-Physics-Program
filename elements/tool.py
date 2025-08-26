@@ -25,7 +25,7 @@ class Tool:
         pass
 
     @abstractmethod
-    def initiate(self, event: pm.Vec2d):
+    def initiate(self, event: pm.Vec2d, at_center: bool):
         pass
 
     @abstractmethod

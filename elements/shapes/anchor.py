@@ -48,7 +48,7 @@ class Anchor(Tool):
 
         return False
 
-    def initiate(self, event):
+    def initiate(self, event, _):
         if self.find_parent(event):
             self.position = event
             return True

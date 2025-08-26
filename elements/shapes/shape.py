@@ -114,7 +114,7 @@ class Shape(ABC, Tool):
                     return [boundX, boundY]
         return None
     
-    def initiate(self, event):
+    def initiate(self, event, _):
         # If mouse not on any other element, than create a new one
         self.creationFlag = True
 
